@@ -50,10 +50,14 @@
     letter-spacing:-0.015em; margin-bottom:28px;
   }
   h1 em{font-style:italic; color:var(--acc);}
-  .statline{display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; font-size:15px; color:var(--mut);}
+  .statline{display:flex; gap:0 10px; align-items:center; font-size:14.5px; color:var(--mut);}
   .statline > span{white-space:nowrap;}
-  .statline > span + span::before{content:"\00B7"; color:var(--acc); margin-right:14px; font-weight:700;}
+  .statline > span + span::before{content:"\00B7"; color:var(--acc); margin-right:10px; font-weight:700;}
   .statline b{color:var(--ink); font-weight:650;}
+  @media(max-width:719px){
+    .statline{flex-direction:column; align-items:flex-start; gap:7px;}
+    .statline > span + span::before{content:""; margin:0;}
+  }
   .readnote{margin-top:22px; font-size:14px; color:var(--mut); font-style:italic;}
 
   section, footer.sec{padding:40px 0 8px; border-top:1px solid var(--line); margin-top:38px;}
@@ -169,6 +173,13 @@
   .layer.open .why{display:block;}
   .layers-foot{margin-top:12px; font-size:13.5px; color:var(--mut);}
 
+  /* HOW I LEAD — three rules */
+  .rules{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:20px 0 4px;}
+  @media(max-width:680px){.rules{grid-template-columns:1fr;}}
+  .rule{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px;}
+  .rule h3{font-family:Georgia, serif; font-size:16.5px; margin-bottom:8px; color:var(--acc);}
+  .rule p{font-size:13.5px; color:var(--mut); margin:0; line-height:1.55;}
+
   /* EXHIBIT F — org toggle */
   .seg{display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; margin-bottom:16px;}
   .seg button{all:unset; cursor:pointer; font:600 13px var(--mono); padding:8px 14px; color:var(--mut);}
@@ -217,7 +228,7 @@
   <a href="#p3"><span class="tick"></span><span class="lbl">MARKET MAP</span></a>
   <a href="#lead"><span class="tick"></span><span class="lbl">HOW I LEAD</span></a>
   <a href="#origin"><span class="tick"></span><span class="lbl">ORIGIN</span></a>
-  <a href="#clock"><span class="tick"></span><span class="lbl">PERSONAL BUILDS</span></a>
+  <a href="#clock"><span class="tick"></span><span class="lbl">MY OWN MONEY</span></a>
   <a href="#who"><span class="tick"></span><span class="lbl">SIGNATURE</span></a>
   <a href="#colophon"><span class="tick"></span><span class="lbl">COLOPHON</span></a>
 </nav>
@@ -228,8 +239,8 @@
   <div class="kicker">BOER CHEN · REVENUE &amp; OPERATING SYSTEMS</div>
   <h1>I make the revenue call, then I build the system that <em>proves</em> it.</h1>
   <div class="statline">
-    <span><b class="num">$0 → $5M</b> and an acquisition</span>
-    <span>a <b class="num">$100M</b>, six-brand unit today</span>
+    <span><b class="num">$0 → $5M</b>, then acquired</span>
+    <span>a <b class="num">$100M</b> unit, six brands</span>
     <span>every system below, <b>I built</b></span>
   </div>
 </header>
@@ -311,9 +322,17 @@
 </section>
 
 <section class="reveal" id="lead">
-  <div class="kicker">HOW I LEAD · PEOPLE, THEN PROCESS</div>
-  <h2>Put people where they win</h2>
-  <p>My philosophy is simple to say and slow to do. Find each person's strengths and weaknesses, be very direct with them about both, learn what fuels them, and give them direction that way. When someone is doing the work their strength is built for, they get better at the job and the company gets more out of them. Nobody opens up to a manager on day one. I earn that over time, with direct feedback, and by being wrong in public when I am wrong.</p>
+  <div class="kicker">HOW I LEAD · THREE RULES</div>
+  <h2>Three rules</h2>
+
+  <div class="rules">
+    <div class="rule"><h3>Data-driven</h3>
+      <p>When we disagree, we go find the data. When there is no data, we run a test, and the test settles it. People stop guessing when they trust the number in front of them.</p></div>
+    <div class="rule"><h3>Clear is kind</h3>
+      <p>I say the thing directly, never down at someone. Feedback comes early and often, and it goes both ways: if I am wrong, I am wrong, and the team knows it.</p></div>
+    <div class="rule"><h3>Put people where they win</h3>
+      <p>Find each person's strengths and weaknesses, learn what fuels them, and give them direction that way. Someone doing the work their strength is built for is good for everyone.</p></div>
+  </div>
 
   <figure class="exhibit">
     <div class="exhibit-tag">Exhibit D · The team, measured</div>
@@ -329,10 +348,8 @@
       <p class="orgnote" id="orgnote">The amber dot is me.</p>
       <div class="orgstat">10 people then · 175 in the room today</div>
     </div>
-    <figcaption>Tap the tabs. Same person, two very different rooms.</figcaption>
+    <figcaption>Tap the tabs. Same person, two very different rooms. The score was never the goal: happy people do better work, and the score follows.</figcaption>
   </figure>
-
-  <p>The process side is the same discipline. Clear is kind. I say the thing directly, never down at someone. When we disagree, we go find the data. When there is no data, we run a test, and the test settles it. People stop guessing when they trust the number in front of them.</p>
 </section>
 
 <section class="reveal" id="origin">
@@ -359,7 +376,7 @@
 
 
 <section class="reveal" id="clock">
-  <div class="kicker">PERSONAL BUILDS · STOCKS AND SNEAKERS</div>
+  <div class="kicker">MY OWN MONEY · STOCKS AND SNEAKERS</div>
   <h2>The agent that approves my trades</h2>
   <p>I like investing, so I built the AI agent that has to approve my own trades. Five layers, because any single source of conviction will lie to you. Each layer is a separate witness checking a different way to be wrong.</p>
 
