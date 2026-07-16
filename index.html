@@ -88,6 +88,7 @@
   .counter{font:700 clamp(46px,9vw,74px)/1 Georgia, serif; letter-spacing:-0.02em;
     font-variant-numeric:tabular-nums; color:var(--acc); margin:6px 0 4px;}
   .counter-base{font-size:13px; color:var(--mut); font-family:var(--mono); margin-bottom:14px;}
+  .statnum{font:700 clamp(40px,7vw,58px)/1 Georgia, serif; color:var(--acc); letter-spacing:-0.02em; margin:4px 0 4px;}
   .chips{display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:8px;}
   .chip{border:1px solid var(--line); background:var(--paper); border-radius:20px;
     padding:5px 12px; font-size:13px; color:var(--mut);}
@@ -214,9 +215,9 @@
   <a href="#p1"><span class="tick"></span><span class="lbl">$5M EXIT</span></a>
   <a href="#p2"><span class="tick"></span><span class="lbl">SIX BRANDS</span></a>
   <a href="#p3"><span class="tick"></span><span class="lbl">MARKET MAP</span></a>
-  <a href="#origin"><span class="tick"></span><span class="lbl">ORIGIN</span></a>
   <a href="#lead"><span class="tick"></span><span class="lbl">HOW I LEAD</span></a>
-  <a href="#clock"><span class="tick"></span><span class="lbl">OFF THE CLOCK</span></a>
+  <a href="#origin"><span class="tick"></span><span class="lbl">ORIGIN</span></a>
+  <a href="#clock"><span class="tick"></span><span class="lbl">PERSONAL BUILDS</span></a>
   <a href="#who"><span class="tick"></span><span class="lbl">SIGNATURE</span></a>
   <a href="#colophon"><span class="tick"></span><span class="lbl">COLOPHON</span></a>
 </nav>
@@ -309,6 +310,31 @@
   </figure>
 </section>
 
+<section class="reveal" id="lead">
+  <div class="kicker">HOW I LEAD · PEOPLE, THEN PROCESS</div>
+  <h2>Put people where they win</h2>
+  <p>My philosophy is simple to say and slow to do. Find each person's strengths and weaknesses, be very direct with them about both, learn what fuels them, and give them direction that way. When someone is doing the work their strength is built for, they get better at the job and the company gets more out of them. Nobody opens up to a manager on day one. I earn that over time, with direct feedback, and by being wrong in public when I am wrong.</p>
+
+  <figure class="exhibit">
+    <div class="exhibit-tag">Exhibit D · The team, measured</div>
+    <div class="statnum">+18</div>
+    <div class="counter-base">team engagement points in my first year · into the top quarter of company teams</div>
+    <div class="seg" role="tablist">
+      <button class="on" id="segbif" role="tab">BIF</button>
+      <button id="segcol" role="tab">Colibri</button>
+    </div>
+    <div class="orgview">
+      <div class="headline" id="orghead">10 people, one plan, $5M.</div>
+      <div class="dots" id="orgdots" aria-live="polite"></div>
+      <p class="orgnote" id="orgnote">The amber dot is me.</p>
+      <div class="orgstat">10 people then · 175 in the room today</div>
+    </div>
+    <figcaption>Tap the tabs. Same person, two very different rooms.</figcaption>
+  </figure>
+
+  <p>The process side is the same discipline. Clear is kind. I say the thing directly, never down at someone. When we disagree, we go find the data. When there is no data, we run a test, and the test settles it. People stop guessing when they trust the number in front of them.</p>
+</section>
+
 <section class="reveal" id="origin">
   <div class="kicker">ORIGIN · SHANGHAI TO BOSTON</div>
   <h2>Where I come from</h2>
@@ -318,7 +344,7 @@
   <p>First job: design. Then self-taught code, shipping client websites in HTML, PHP and JavaScript. Then marketing across an incubator's portfolio: retail brands sold into Whole Foods and Costco, wholesale goods, a film library holding one of Bruce Lee's films, and the finance-education firm the first chapter above is about. Every company was a new business to read fast. That is why six brands do not scare me.</p>
 
   <figure class="exhibit context">
-    <div class="exhibit-tag">Exhibit D · The route (context)</div>
+    <div class="exhibit-tag">Exhibit E · The route (context)</div>
     <div class="journey" style="grid-template-columns:1fr">
       <ol class="route" id="route">
         <li><b>Shanghai · Fudan University</b><span>psychology, top 30 in the world</span></li>
@@ -331,32 +357,9 @@
   </figure>
 </section>
 
-<section class="reveal" id="lead">
-  <div class="kicker">HOW I LEAD · PEOPLE AND SYSTEMS</div>
-  <h2>Clear is kind</h2>
-  <p>I communicate directly, never down at someone, and when we disagree we go find the data. No data means we run a test, and the test settles it. If I am wrong, I am wrong, and the team knows it. That is why the wins carry weight.</p>
-  <p>The other half of the job is people, and it runs on the same discipline. Everyone on a team needs something different from a manager, so I learn each person's real strengths, learn what fuels them, and stay direct about both. Then I point them at the work where their strength wins, and keep the feedback coming while the trust builds, because trust in a manager is earned slowly. A year after I took over my current team, our engagement score had risen eighteen points, into the top quarter of teams. The score was never the goal. I want the team happy at the job. Happy people do better work, and the score follows.</p>
-
-  <figure class="exhibit">
-    <div class="exhibit-tag">Exhibit E · The org, to scale</div>
-    <div class="seg" role="tablist">
-      <button class="on" id="segbif" role="tab">BIF</button>
-      <button id="segcol" role="tab">Colibri</button>
-    </div>
-    <div class="orgview">
-      <div class="headline" id="orghead">10 people, one plan, $5M.</div>
-      <div class="dots" id="orgdots" aria-live="polite"></div>
-      <p class="orgnote" id="orgnote">The amber dot is me.</p>
-      <div class="orgstat">10 people then · 175 in the room today · engagement up 18 points in year one</div>
-    </div>
-    <figcaption>Tap the tabs. Same person, two very different rooms.</figcaption>
-  </figure>
-
-  <p>The style holds at both sizes: people stop guessing when they trust the number in front of them.</p>
-</section>
 
 <section class="reveal" id="clock">
-  <div class="kicker">OFF THE CLOCK · SAME LOOP, MY OWN MONEY</div>
+  <div class="kicker">PERSONAL BUILDS · STOCKS AND SNEAKERS</div>
   <h2>The agent that approves my trades</h2>
   <p>I like investing, so I built the AI agent that has to approve my own trades. Five layers, because any single source of conviction will lie to you. Each layer is a separate witness checking a different way to be wrong.</p>
 
