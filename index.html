@@ -134,28 +134,14 @@
     <span>a <b class="num">$100M</b>, six-brand unit today</span><span class="dot">·</span>
     <span>every system below, <b>I built</b></span>
   </div>
-  <p class="readnote">The story runs in order. It reads in three minutes.</p>
+  <p class="readnote">Proof first, story after. Three minutes.</p>
 </header>
 
 <section class="reveal">
   <span class="stopmark"></span>
-  <h2>China, then Syracuse</h2>
-  <p>I studied psychology at Fudan University in Shanghai. If you do not know the Chinese schools: QS ranks Fudan around 30th in the world, the same neighborhood as the Ivy League. I learned why people do what they do before I learned what a funnel was, and it is still the most useful thing I studied. Then a communications degree at Syracuse, where I learned to say the thing plainly.</p>
-  <p>One more thing about that chapter: it is not easy for a Chinese graduate who is not an engineer to stay in the US. Of the Chinese classmates I knew, none managed to stay. The visa math does not favor a psychology-and-communications kid. I stayed anyway, on work that proved itself.</p>
-</section>
-
-<section class="reveal">
-  <span class="stopmark"></span>
-  <h2>The incubator years</h2>
-  <p>My first real chapter was CP Baker, an incubator in Boston that owned very different companies. I started in design, taught myself to code, and shipped the companies' websites in HTML, PHP and JavaScript. Then I ran digital marketing across the portfolio: a shampoo and a nutrition bar sold into Whole Foods and Costco, a wholesale business moving bulk daily work goods, an IP company that owned a film library, including one of Bruce Lee's films, and a finance-education firm. Every company was a new industry, so reading a new business fast stopped being a skill and became the job.</p>
-  <p>That range is why a six-brand unit does not overwhelm me today. I have been the new guy in a strange industry many times, and I know how to find the parts that matter.</p>
-</section>
-
-<section class="reveal">
-  <span class="stopmark"></span>
-  <h2>Boston Institute of Finance: $0 to $5M, then an acquisition</h2>
-  <p>One portfolio company became the focus: Boston Institute of Finance, education for wealth-management firms, registered investment advisors and banks. Regulated finance, where a compliance mistake does not cost you a deal, it costs you the license. When we took the company over it had essentially no business.</p>
-  <p>I grew into running it. By the end I was the director of revenue operations and essentially the chief operating officer: everyone except the CEO ran on my plan, and everyone was ten people, counting the admin and the accountant. With that headcount I owned which education products we built, the demand generation and retention systems, the reporting, and the budget, so every experiment had a cost and an owner attached.</p>
+  <h2>$0 to $5M, then an acquisition</h2>
+  <p>Boston Institute of Finance: education for wealth-management firms, registered investment advisors and banks. Regulated finance, where a compliance mistake costs the license, not the deal. The company had essentially no business when we took it over.</p>
+  <p>By the end I ran it as director of revenue operations and de facto COO. Everyone except the CEO ran on my plan, and everyone was ten people, counting the admin and the accountant. Product, demand generation, retention, reporting, budget: one owner.</p>
 
   <figure class="panel">
     <svg id="revsvg" viewBox="0 0 600 190" width="100%" role="img" aria-label="Revenue line from zero to five million dollars, ending in acquisition">
@@ -170,23 +156,23 @@
     <figcaption>Revenue at Boston Institute of Finance, from essentially nothing to $5M and an acquisition by Colibri Group.</figcaption>
   </figure>
 
-  <p>We took revenue from nothing to <span class="num">$5M</span>, and Colibri Group acquired the company. I led the integration: carrying the team, the products and the systems into the buyer without dropping the revenue. Ten people to $5M in a regulated market is the proudest math of my career. The plan was mine, and so was the machine under it.</p>
+  <p>Revenue went from nothing to <span class="num">$5M</span>, Colibri Group acquired the company, and I led the integration. Ten people to $5M in a regulated market. The plan was mine, and so was the machine under it.</p>
 </section>
 
 <section class="reveal">
   <span class="stopmark"></span>
-  <h2>Colibri: six brands, one brain</h2>
-  <p>Today I am Director of Business Operations for a $100M unit at Colibri Group, professional education in regulated industries, where every one of our six brands answers to a different licensing rulebook. The unit sits inside an ecosystem of about 300 people. My direct team is about 25, and roughly 150 people across marketing, sales and engineering run on the roadmaps and plans my team sets. The job is planning, timelines, keeping six brands collaborating, and pivoting fast when the data says pivot.</p>
-  <p>Six brands means six industries, six workflows, six vocabularies. No amount of status meetings keeps that in one head, so I built the unit a brain instead. Here is the thinking: an AI model is a good reasoner and a terrible place to store the truth. It forgets, and you cannot inspect what it believes. So the brain is not the model. The brain is a plain, versioned knowledge base the model reasons against: how each brand works, what its terms mean, who owns what, which decisions were made and why. In practice it is plain files under version control, readable by me and by the agents, no vendor in the middle. The agents read from it while I work, and whatever a conversation teaches me gets written back in the same day, so the system knows more every week than it did the week before. Documents start accurate instead of starting blank.</p>
+  <h2>Six brands, one brain</h2>
+  <p>Today I am Director of Business Operations for a $100M unit at Colibri Group, professional education in regulated industries. My direct team is about 25. Roughly 150 people across marketing, sales and engineering run on the plans my team sets.</p>
+  <p>The six brands all live in financial services, and they are still drastically different businesses: wealth management, insurance, banking, each with its own model, workflow and vocabulary. No amount of status meetings keeps that in one head. So I built the unit a brain. An AI model is a good reasoner and a terrible place to store the truth, so the brain is not the model: it is a plain, versioned knowledge base the agents reason against, and whatever a conversation teaches me is written back the same day. It compounds. Documents start accurate. And because shared numbers are the same discipline, a large part of my job is making six brands agree on one set of them.</p>
 
   <figure class="panel">
     <div class="brain">
       <div class="files">
         <b>brain/</b><br>
         ├ brands/<br>
-        │ ├ <b>summit-licensing.md</b><br>
-        │ ├ harbor-compliance.md<br>
-        │ ├ juniper-education.md<br>
+        │ ├ <b>summit-wealth.md</b><br>
+        │ ├ harbor-insurance.md<br>
+        │ ├ juniper-banking.md<br>
         │ └ … three more brands<br>
         ├ terms/<b>glossary.md</b><br>
         ├ owners/<b>who-owns-what.md</b><br>
@@ -202,42 +188,25 @@
     </div>
     <figcaption>Sanitized mock. Brand names are fake; the structure and the loop are real.</figcaption>
   </figure>
-
-  <p>The same rule runs the human side. If every team looks at its own data, you never get anywhere, so a large part of my job is making six brands agree on one set of numbers. The brain is how I navigate the context. The shared numbers are how the teams navigate each other.</p>
 </section>
 
 <section class="reveal">
   <span class="stopmark"></span>
   <h2>A market map that refreshes itself</h2>
-  <p>One build from inside that unit, in full. For our insurance-education brand I needed to rank the market: which companies employ the most licensed insurance agents. My first version ranked them by a dropout story, how many agents wash out and when. The data would not carry that thesis, so I killed it and ranked by plain headcount instead.</p>
-  <p>The build is a table in Clay, a go-to-market data tool, that reads the Texas insurance regulator's public data feed directly, adds the counts up per company, and re-pulls the feed monthly. Nothing is pasted in, so it does not go stale, and nobody has to maintain it. The map surfaced <span class="num">46</span> insurance carriers that all sell through the same distributor, and that finding set the segmentation and the outreach plan for the brand.</p>
+  <p>One build in full. I needed to rank the insurance-education market by licensed agents per company. My first thesis was wrong: I ranked by agent dropout, the data would not carry it, and I killed it. The rebuilt version is a table in Clay, a go-to-market data tool, that reads the Texas regulator's public feed, aggregates per company, and re-pulls monthly. Nobody maintains it. It surfaced <span class="num">46</span> carriers selling through one distributor, and that set the segmentation and the outreach.</p>
 </section>
 
 <section class="reveal">
   <span class="stopmark"></span>
-  <h2>How I lead</h2>
-  <p>Clear is kind. I communicate directly, never down at someone, and data is my weapon. When we disagree, we go find the data. When the data does not exist, we run a test, and the test settles it. If I am wrong, I am wrong. I am not shy about being proved wrong, and the team knows it, which is exactly why the wins carry weight.</p>
-
-  <div class="orgs">
-    <div class="org">
-      <h3>BIF · the one leader</h3>
-      <div class="dots" id="dots-bif" aria-label="Ten people, one of them me"></div>
-      <p>Ten people, everyone on one plan. $5M.</p>
-    </div>
-    <div class="org">
-      <h3>Colibri · one of several</h3>
-      <div class="dots" id="dots-col" aria-label="Twenty-five direct, one hundred fifty cross-functional"></div>
-      <p>25 direct, ~150 across marketing, sales and engineering on my team's plans.</p>
-    </div>
-  </div>
-
-  <p>I have led both shapes: the ten-person company where I was the one leader under the CEO, and the 150-person cross-functional floor where I am one of several. The style holds at both sizes. People stop guessing when the number in front of them is one they trust, and trust in the number is something you earn by letting it prove you wrong in public.</p>
+  <h2>Where I come from</h2>
+  <p>Psychology at Fudan University in Shanghai, QS top 30 in the world, the Ivy League's neighborhood. Then communications at Syracuse. A visa note: almost no Chinese graduate outside engineering gets to stay in the US. Of my Chinese classmates, none did. I stayed on work that proved itself.</p>
+  <p>First job: design. Then self-taught code, shipping client websites in HTML, PHP and JavaScript. Then marketing across an incubator's portfolio: retail brands sold into Whole Foods and Costco, wholesale goods, a film library holding one of Bruce Lee's films, and the finance-education firm that became the story above. Every company was a new business to read fast. That is why six brands do not scare me.</p>
 </section>
 
 <section class="reveal">
   <span class="stopmark"></span>
   <h2>Off the clock</h2>
-  <p>I like investing, so I built an agent that evaluates any stock before I am allowed to act on an idea. It checks five layers, and the count is not decoration. Any single source of conviction will happily lie to you, so each layer is a separate witness checking a different way to be wrong. Tap them:</p>
+  <p>I built the investing agent that clears my own trades. Five layers, because any single source of conviction will lie to you. Each is a separate witness checking a different way to be wrong. Tap them:</p>
 
   <figure class="panel">
     <div class="layers" id="layers">
@@ -252,18 +221,39 @@
       <div class="layer"><button>5 · Crowd behavior <span class="verdict">who else is piling in</span></button>
         <div class="why">The strange one. When the crowd agrees with me too loudly, I read it as a warning, not a confirmation.</div></div>
     </div>
-    <p class="layers-foot">Five witnesses agree, I act. They argue, I size small or walk. Most mornings its real job is talking me out of something.</p>
+    <p class="layers-foot">Five agree, I act. They argue, I size small or walk. Most mornings its real job is talking me out of something.</p>
     <figcaption>Mocked-up view of my personal stock agent's checklist. The framework is real; my portfolio stays private.</figcaption>
   </figure>
 
-  <p>My wife and I also collect sneakers, so I built a phone app that scans a shoebox and fills in the shoe, its release and its market price. Less philosophy in that one. The boxes were winning.</p>
+  <p>My wife and I also collect sneakers, so I built an app that scans a shoebox and fills in the shoe and its market price. The boxes were winning.</p>
+</section>
+
+<section class="reveal">
+  <span class="stopmark"></span>
+  <h2>How I lead</h2>
+  <p>Clear is kind. Disagreement means we go find the data. No data means we run a test, and the test settles it. If I am wrong, I am wrong, and the team knows it. That is why the wins carry weight.</p>
+
+  <div class="orgs">
+    <div class="org">
+      <h3>BIF · the one leader</h3>
+      <div class="dots" id="dots-bif" aria-label="Ten people, one of them me"></div>
+      <p>Ten people, everyone on one plan. $5M.</p>
+    </div>
+    <div class="org">
+      <h3>Colibri · one of several</h3>
+      <div class="dots" id="dots-col" aria-label="Twenty-five direct, one hundred fifty cross-functional"></div>
+      <p>25 direct, ~150 across marketing, sales and engineering on my team's plans.</p>
+    </div>
+  </div>
+
+  <p>Two shapes so far, and the style holds at both sizes: people stop guessing when they trust the number in front of them.</p>
 </section>
 
 <section class="reveal">
   <span class="stopmark"></span>
   <h2>Who is writing this</h2>
-  <p class="sig">I am Boer Chen. Bo.</p>
-  <p>Director-level operator, twelve years from a psychology classroom in China to a $100M unit, with one company taken from nothing to $5M and through its acquisition along the way. I decide with evidence, I build the systems that produce the evidence, and I lead teams that stop guessing. Open to the right role.</p>
+  <p class="sig">I am Boer Chen.</p>
+  <p>Over a decade of operating, from a psychology classroom in China to a $100M unit, with one company taken from nothing to $5M and through its acquisition. I decide with evidence, I build the systems that produce it, and I lead teams that stop guessing. Open to the right role.</p>
   <div class="contact">
     <a href="mailto:chenboer000@gmail.com">Email me</a>
     <a href="https://www.linkedin.com/in/boerchen/">LinkedIn</a>
@@ -272,7 +262,7 @@
 
 <footer class="reveal">
   <h2>Colophon: how this site was made</h2>
-  <p>Every fact on this page is mine, and I checked each one. What the loop tested is whether you would understand them. I had agents draft the page three different ways from my history and corrections, then separate agents read each version cold, the way a stranger would, and reported back what they understood in 30 seconds, what confused them, and what they would repeat to a friend. Where a reader got me wrong, I rewrote, and the readers read again. The version you just finished is the one strangers understood. It is the same loop I run at work and on my stock agent: propose, verify against a reader who does not flatter you, keep what survives. Built with Claude Code.</p>
+  <p>Every fact here is mine and checked. The loop tested whether you would understand them: agents drafted this page several ways, other agents read each version cold like a stranger, and the failing versions were rewritten until the cold reads came back right. Even the section order was chosen by cold readers, not by me. It is the same loop I run at work: propose, verify against a reader who does not flatter you, keep what survives. Built with Claude Code.</p>
 </footer>
 
 </main>
