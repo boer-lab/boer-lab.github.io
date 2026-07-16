@@ -92,7 +92,9 @@
   .counter{font:700 clamp(46px,9vw,74px)/1 Georgia, serif; letter-spacing:-0.02em;
     font-variant-numeric:tabular-nums; color:var(--acc); margin:6px 0 4px;}
   .counter-base{font-size:13px; color:var(--mut); font-family:var(--mono); margin-bottom:14px;}
-  .statnum{font:700 clamp(40px,7vw,58px)/1 Georgia, serif; color:var(--acc); letter-spacing:-0.02em; margin:4px 0 4px;}
+  .statnum{font:700 clamp(34px,6vw,46px)/1 Georgia, serif; color:var(--acc); letter-spacing:-0.02em;}
+  .statrow{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin:4px 0 14px;}
+  .statrow .counter-base{margin-bottom:0;}
   .chips{display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:8px;}
   .chip{border:1px solid var(--line); background:var(--paper); border-radius:20px;
     padding:5px 12px; font-size:13px; color:var(--mut);}
@@ -178,6 +180,7 @@
   @media(max-width:680px){.rules{grid-template-columns:1fr;}}
   .rule{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px;}
   .rule h3{font-family:Georgia, serif; font-size:16.5px; margin-bottom:8px; color:var(--acc);}
+  @media(min-width:681px){ .rule h3{min-height:48px; line-height:1.25;} }
   .rule p{font-size:13.5px; color:var(--mut); margin:0; line-height:1.55;}
 
   /* EXHIBIT F — org toggle */
@@ -336,8 +339,10 @@
 
   <figure class="exhibit">
     <div class="exhibit-tag">Exhibit D · The team, measured</div>
-    <div class="statnum">+18</div>
-    <div class="counter-base">team engagement points in my first year · into the top quarter of company teams</div>
+    <div class="statrow">
+      <div class="statnum">+18%</div>
+      <div class="counter-base">team engagement, year one · now top quarter of teams</div>
+    </div>
     <div class="seg" role="tablist">
       <button class="on" id="segbif" role="tab">BIF</button>
       <button id="segcol" role="tab">Colibri</button>
