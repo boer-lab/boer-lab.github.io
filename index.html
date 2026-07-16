@@ -130,11 +130,9 @@
   /* EXHIBIT D — journey */
   .journey{display:grid; grid-template-columns:auto 1fr; gap:22px; align-items:start;}
   @media(max-width:600px){.journey{grid-template-columns:1fr;}}
-  .portrait{width:132px; height:132px; border-radius:12px; object-fit:cover; display:block;
-    filter:grayscale(1) contrast(1.08); border:1px solid var(--line);}
-  .portrait-wrap{position:relative; width:132px;}
-  .portrait-wrap::after{content:""; position:absolute; inset:0; border-radius:12px;
-    background:linear-gradient(160deg, rgba(22,107,71,.28), transparent 60%); pointer-events:none;}
+  .portrait{width:132px; height:132px; border-radius:50%; object-fit:cover; display:block;
+    filter:grayscale(1) contrast(1.06);}
+  .portrait-wrap{width:132px;}
   .route{list-style:none; margin:2px 0 0;}
   .route li{position:relative; padding:0 0 16px 22px; border-left:2px solid var(--line);
     opacity:0; transform:translateY(8px); transition:all .5s var(--ease);}
@@ -213,9 +211,9 @@
 <div id="progress"></div>
 
 <nav id="rail" aria-label="Sections">
-  <a href="#p1"><span class="tick"></span><span class="lbl">PROOF 01</span></a>
-  <a href="#p2"><span class="tick"></span><span class="lbl">PROOF 02</span></a>
-  <a href="#p3"><span class="tick"></span><span class="lbl">PROOF 03</span></a>
+  <a href="#p1"><span class="tick"></span><span class="lbl">$5M EXIT</span></a>
+  <a href="#p2"><span class="tick"></span><span class="lbl">SIX BRANDS</span></a>
+  <a href="#p3"><span class="tick"></span><span class="lbl">TAM MACHINE</span></a>
   <a href="#origin"><span class="tick"></span><span class="lbl">ORIGIN</span></a>
   <a href="#clock"><span class="tick"></span><span class="lbl">OFF THE CLOCK</span></a>
   <a href="#lead"><span class="tick"></span><span class="lbl">HOW I LEAD</span></a>
@@ -233,7 +231,7 @@
     <span>a <b class="num">$100M</b>, six-brand unit today</span>
     <span>every system below, <b>I built</b></span>
   </div>
-  <p class="readnote">Proof first, story after. Three minutes.</p>
+  <p class="readnote">The whole page reads in three minutes.</p>
 </header>
 
 <section class="reveal" id="p1">
@@ -322,10 +320,7 @@
 
   <figure class="exhibit context">
     <div class="exhibit-tag">Exhibit D · The route (context)</div>
-    <div class="journey">
-      <div class="portrait-wrap" id="pwrap">
-        <img class="portrait" id="portrait" src="headshot.jpg" alt="Boer Chen">
-      </div>
+    <div class="journey" style="grid-template-columns:1fr">
       <ol class="route" id="route">
         <li><b>Shanghai · Fudan University</b><span>psychology, QS top 30 worldwide</span></li>
         <li><b>Syracuse</b><span>master's, new media management · stayed against the visa odds</span></li>
@@ -375,8 +370,8 @@
   <figure class="exhibit">
     <div class="exhibit-tag">Exhibit F · The org, to scale</div>
     <div class="seg" role="tablist">
-      <button class="on" id="segbif" role="tab">BIF · 2021–24</button>
-      <button id="segcol" role="tab">Colibri · today</button>
+      <button class="on" id="segbif" role="tab">BIF</button>
+      <button id="segcol" role="tab">Colibri</button>
     </div>
     <div class="orgview">
       <div class="headline" id="orghead">The one leader: 10 people, one plan, $5M.</div>
@@ -393,11 +388,16 @@
 <section class="reveal" id="who">
   <div class="kicker">SIGNATURE</div>
   <h2>Who is writing this</h2>
+  <div class="journey">
+    <div class="portrait-wrap" id="pwrap"><img class="portrait" id="portrait" src="headshot.webp" alt="Boer Chen"></div>
+    <div>
   <p class="sig">I am Boer Chen.</p>
   <p>Over a decade of operating, from a psychology classroom in China to a $100M unit, with one company taken from nothing to $5M and through its acquisition. I decide with evidence, I build the systems that produce it, and I lead teams that stop guessing. Open to the right role.</p>
   <div class="contact">
     <a href="mailto:chenboer000@gmail.com">Email me</a>
     <a href="https://www.linkedin.com/in/boerchen/">LinkedIn</a>
+  </div>
+    </div>
   </div>
 </section>
 
