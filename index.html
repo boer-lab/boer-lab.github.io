@@ -50,7 +50,9 @@
     letter-spacing:-0.015em; margin-bottom:28px;
   }
   h1 em{font-style:italic; color:var(--acc);}
-  .statline{display:flex; flex-wrap:wrap; gap:8px 30px; align-items:center; font-size:15px; color:var(--mut);}
+  .statline{display:flex; flex-wrap:wrap; gap:10px 14px; align-items:center; font-size:15px; color:var(--mut);}
+  .statline > span{white-space:nowrap;}
+  .statline > span + span::before{content:"\00B7"; color:var(--acc); margin-right:14px; font-weight:700;}
   .statline b{color:var(--ink); font-weight:650;}
   .readnote{margin-top:22px; font-size:14px; color:var(--mut); font-style:italic;}
 
@@ -136,7 +138,7 @@
   .route{list-style:none; margin:2px 0 0;}
   .route li{position:relative; padding:0 0 16px 22px; border-left:2px solid var(--line);
     opacity:0; transform:translateY(8px); transition:all .5s var(--ease);}
-  .route li:last-child{border-left-color:transparent; padding-bottom:2px;}
+  .route li:last-child{border-left-color:transparent; padding-bottom:0;}
   .route.go li{opacity:1; transform:none;}
   .route li::before{content:""; position:absolute; left:-7px; top:3px; width:12px; height:12px;
     border-radius:50%; background:var(--card); border:2.5px solid var(--acc);}
@@ -177,8 +179,7 @@
   .dots i{width:9px; height:9px; border-radius:50%; background:var(--acc); display:block;
     animation:pop .4s var(--ease) backwards;}
   .dots i.lite{background:transparent; border:1.5px solid var(--acc); opacity:.55;}
-  .dots i.me{width:11px; height:11px; background:var(--card); border:2.5px solid var(--acc);
-    box-shadow:0 0 0 2px var(--card);}
+  .dots i.me{width:11px; height:11px; background:var(--amber);}
   @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
   .orgnote{font-size:13px; color:var(--mut); margin-top:10px;}
   .orgstat{font:600 12px var(--mono); color:var(--amber); margin-top:12px;}
@@ -380,7 +381,7 @@
     <div class="orgview">
       <div class="headline" id="orghead">The one leader: 10 people, one plan, $5M.</div>
       <div class="dots" id="orgdots" aria-live="polite"></div>
-      <p class="orgnote" id="orgnote">Everyone except the CEO. The ringed dot is me.</p>
+      <p class="orgnote" id="orgnote">Everyone except the CEO. The amber dot is me.</p>
       <div class="orgstat">10 people then · 175 in the room today</div>
     </div>
     <figcaption>Tap the tabs. Same person, two very different rooms.</figcaption>
@@ -404,7 +405,7 @@
   <div class="kicker">COLOPHON</div>
   <h2>How this site was made</h2>
   <p>Every fact here is mine and checked. The loop tested whether you would understand them: agents drafted this page several ways, other agents read each version cold like a stranger, and the failing versions were rewritten until the cold reads came back right. Even the section order was chosen by cold readers, not by me. It is the same loop I run at work: propose, verify against a reader who does not flatter you, keep what survives. Built with Claude Code.</p>
-  <div class="trail"><span>3 drafts</span><span>9 cold reads</span><span>2 orders A/B tested</span><span>1 false claim caught &amp; cut</span><span>detector-checked</span></div>
+  <div class="trail"><span>3 drafts</span><span>9 cold reads</span><span>2 orders A/B tested</span><span>5 design judges</span><span>1 false claim caught &amp; cut</span><span>detector-checked</span></div>
 </footer>
 
 </main>
@@ -497,7 +498,11 @@
 
   // EXHIBIT D — portrait fallback
   const img = document.getElementById('portrait');
-  img.addEventListener('error', () => document.getElementById('pwrap').remove());
+  img.addEventListener('error', () => {
+    const wrap = document.getElementById('pwrap');
+    wrap.closest('.journey').style.gridTemplateColumns = '1fr';
+    wrap.remove();
+  });
 
   // EXHIBIT E — runnable layers
   const layerEls = [...document.querySelectorAll('#layers .layer')];
@@ -533,8 +538,8 @@
       ? 'The one leader: 10 people, one plan, $5M.'
       : 'One of several: 25 direct, ~150 cross-functional on my team’s plans.';
     orgnote.textContent = mode === 'bif'
-      ? 'Everyone except the CEO. The dark dot is me.'
-      : 'Solid dots report to me; open dots run on the plans. The dark dot is still me.';
+      ? 'Everyone except the CEO. The amber dot is me.'
+      : 'Green dots report to me; open dots run on the plans. The amber dot is still me.';
     segbif.classList.toggle('on', mode === 'bif');
     segcol.classList.toggle('on', mode !== 'bif');
   }
