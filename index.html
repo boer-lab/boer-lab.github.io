@@ -8,165 +8,271 @@
 <meta property="og:title" content="Boer Chen — I make the revenue call, then I build the system that proves it.">
 <meta property="og:description" content="$0 to $5M and an acquisition · a $100M, six-brand unit today · every system on this page, I built.">
 <meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f6f4a'/%3E%3Ctext x='16' y='22' font-family='Georgia' font-size='17' fill='%23fff' text-anchor='middle' font-weight='bold'%3EB%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23166b47'/%3E%3Ctext x='16' y='22' font-family='Georgia' font-size='17' fill='%23fff' text-anchor='middle' font-weight='bold'%3EB%3C/text%3E%3C/svg%3E">
 <style>
   :root{
-    --paper:#faf9f7; --ink:#191a1c; --mut:#5c5f66; --line:#e3e1dc;
-    --acc:#1f6f4a; --acc-soft:#e7f0eb; --card:#ffffff;
+    --paper:#f7f5f1; --ink:#16181d; --mut:#5d6066; --line:#e0ddd5;
+    --acc:#166b47; --acc-soft:#e5efe9; --amber:#b0812a; --card:#fffefb;
+    --mono:ui-monospace, "SF Mono", Menlo, monospace;
+    --ease:cubic-bezier(.22,.9,.3,1);
   }
   @media (prefers-color-scheme: dark){
-    :root{ --paper:#131416; --ink:#e8e6e1; --mut:#9a9da6; --line:#2a2c30;
-           --acc:#5cb888; --acc-soft:#1b2b23; --card:#1a1c1f; }
+    :root{ --paper:#111316; --ink:#eae8e2; --mut:#9b9ea6; --line:#272a2f;
+           --acc:#4fb586; --acc-soft:#17251e; --amber:#d3a44f; --card:#191c20; }
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
   body{
     background:var(--paper); color:var(--ink);
-    font:400 17px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font:400 17px/1.66 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing:antialiased;
   }
-  #progress{position:fixed; top:0; left:0; height:3px; width:0; background:var(--acc); z-index:50;}
+  #progress{position:fixed; top:0; left:0; height:3px; width:0; background:var(--acc); z-index:60;}
+
+  /* section rail (desktop) */
+  #rail{position:fixed; left:max(14px, calc(50vw - 560px)); top:50%; transform:translateY(-50%);
+    display:none; flex-direction:column; gap:14px; z-index:40;}
+  @media(min-width:1080px){ #rail{display:flex;} }
+  #rail a{display:flex; align-items:center; gap:9px; text-decoration:none;}
+  #rail .tick{width:18px; height:2px; background:var(--line); transition:all .3s var(--ease);}
+  #rail .lbl{font:600 10px/1 var(--mono); letter-spacing:.14em; color:var(--mut); opacity:.5; transition:all .3s;}
+  #rail a.on .tick{background:var(--acc); width:28px;}
+  #rail a.on .lbl{color:var(--acc); opacity:1;}
+  #rail a:hover .lbl{opacity:1;}
+
   main{max-width:680px; margin:0 auto; padding:0 22px 60px;}
 
-  header.hero{padding:72px 0 44px;}
+  header.hero{padding:76px 0 46px;}
+  .hero .kicker{margin-bottom:22px;}
   h1{
     font-family:Georgia, "Times New Roman", serif;
-    font-size:clamp(30px, 5.4vw, 44px); line-height:1.16; font-weight:700;
-    letter-spacing:-0.01em; margin-bottom:26px;
+    font-size:clamp(32px, 5.8vw, 50px); line-height:1.12; font-weight:700;
+    letter-spacing:-0.015em; margin-bottom:28px;
   }
-  .statline{display:flex; flex-wrap:wrap; gap:10px 0; align-items:center; font-size:15px; color:var(--mut);}
+  h1 em{font-style:italic; color:var(--acc);}
+  .statline{display:flex; flex-wrap:wrap; gap:8px 30px; align-items:center; font-size:15px; color:var(--mut);}
   .statline b{color:var(--ink); font-weight:650;}
-  .statline .dot{margin:0 12px; color:var(--acc);}
-  .readnote{margin-top:26px; font-size:14px; color:var(--mut); font-style:italic;}
+  .readnote{margin-top:22px; font-size:14px; color:var(--mut); font-style:italic;}
 
-  section{padding:34px 0 6px; border-top:1px solid var(--line); margin-top:34px; position:relative;}
-  .stopmark{
-    position:absolute; top:-9px; left:0; width:16px; height:16px; border-radius:50%;
-    background:var(--paper); border:3px solid var(--acc);
+  section, footer.sec{padding:40px 0 8px; border-top:1px solid var(--line); margin-top:38px;}
+  .kicker{
+    font:700 11px/1 var(--mono); letter-spacing:.18em; color:var(--acc);
+    text-transform:uppercase; display:flex; align-items:center; gap:10px; margin-bottom:14px;
   }
+  .kicker::after{content:""; flex:1; height:1px; background:var(--line);}
   h2{
-    font-family:Georgia, serif; font-size:clamp(21px,3.4vw,26px);
+    font-family:Georgia, serif; font-size:clamp(22px,3.6vw,28px);
     font-weight:700; margin-bottom:16px; letter-spacing:-0.01em;
   }
   p{margin-bottom:15px;}
-  .mut{color:var(--mut);}
   .num{font-variant-numeric:tabular-nums; color:var(--acc); font-weight:650;}
 
-  figure.panel{
-    background:var(--card); border:1px solid var(--line); border-radius:10px;
-    padding:20px; margin:22px 0;
+  /* exhibit grammar: every section has exactly one */
+  .exhibit{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:22px; margin:24px 0;
+    box-shadow:0 1px 0 rgba(0,0,0,.02);
   }
-  figcaption{font-size:12.5px; color:var(--mut); margin-top:12px;}
+  .exhibit-tag{
+    font:700 10px/1 var(--mono); letter-spacing:.16em; color:var(--amber);
+    text-transform:uppercase; margin-bottom:16px;
+    padding-bottom:10px; border-bottom:1px solid var(--line);
+  }
+  .exhibit.context{border-style:dashed;}
+  .exhibit.context .exhibit-tag{color:var(--mut);}
+  .exhibit figcaption{font-size:12.5px; color:var(--mut); margin-top:14px; line-height:1.5;}
 
-  /* revenue chart */
-  #revsvg path.rev{fill:none; stroke:var(--acc); stroke-width:2.5;
-    stroke-dasharray:1000; stroke-dashoffset:1000; transition:stroke-dashoffset 2.4s ease;}
-  #revsvg.drawn path.rev{stroke-dashoffset:0;}
-  #revsvg text{font:600 11px -apple-system, sans-serif; fill:var(--mut);}
-  #revsvg .big{fill:var(--acc); font-size:13px;}
+  /* EXHIBIT A — counter */
+  .counter{font:700 clamp(46px,9vw,74px)/1 Georgia, serif; letter-spacing:-0.02em;
+    font-variant-numeric:tabular-nums; color:var(--acc); margin:6px 0 4px;}
+  .counter-base{font-size:13px; color:var(--mut); font-family:var(--mono); margin-bottom:14px;}
+  .chips{display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:8px;}
+  .chip{border:1px solid var(--line); background:var(--paper); border-radius:20px;
+    padding:5px 12px; font-size:13px; color:var(--mut);}
+  .chip b{color:var(--ink);}
+  .replay{all:unset; cursor:pointer; font:600 12px var(--mono); color:var(--acc);
+    border:1px solid var(--acc); border-radius:6px; padding:12px 14px; margin-top:14px; display:inline-block;}
+  .replay:hover{background:var(--acc-soft);}
 
-  /* brain mock */
-  .brain{display:grid; grid-template-columns:1fr 1fr; gap:16px; font-size:13px;}
-  @media(max-width:560px){.brain{grid-template-columns:1fr;}}
-  .brain .files{font-family:ui-monospace, Menlo, monospace; font-size:12px; line-height:1.9; color:var(--mut);}
-  .brain .files b{color:var(--ink); font-weight:600;}
-  .brain .files .new{color:var(--acc); font-weight:600;}
-  .loop{display:flex; flex-direction:column; gap:6px; justify-content:center;}
-  .loop .step{border:1px solid var(--line); border-radius:7px; padding:7px 11px; background:var(--paper);}
-  .loop .arrow{color:var(--acc); text-align:center; font-size:14px; line-height:1;}
-  .loop .writeback{animation:pulse 2.6s infinite;}
-  @keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+  /* EXHIBIT B — brain cycle */
+  .brainwrap{display:grid; grid-template-columns:1.1fr 1fr; gap:18px;}
+  @media(max-width:600px){.brainwrap{grid-template-columns:1fr;}}
+  .cycle{display:flex; flex-direction:column; gap:7px;}
+  .cnode{border:1px solid var(--line); border-radius:8px; padding:8px 12px; font-size:13.5px;
+    background:var(--paper); transition:all .35s var(--ease); position:relative;}
+  .cnode.hot{border-color:var(--acc); background:var(--acc-soft); transform:translateX(4px);}
+  .cnode .cn{font:700 10px var(--mono); color:var(--acc); margin-right:8px;}
+  .cyc-note{font-size:12px; color:var(--mut); font-family:var(--mono); margin-top:8px;}
+  .cyc-note .live{display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--acc);
+    margin-right:6px; animation:blink 1.6s infinite;}
+  @keyframes blink{0%,100%{opacity:.35}50%{opacity:1}}
+  .files{font-family:var(--mono); font-size:12px; line-height:1.85; color:var(--mut);}
+  .files b{color:var(--ink); font-weight:600;}
+  .files .new{color:var(--acc); font-weight:600; opacity:0; transition:opacity .6s;}
+  .files .new.show{opacity:1;}
 
-  /* five layers */
+  /* EXHIBIT C — funnel machine */
+  .funnel{display:flex; flex-direction:column; gap:6px; position:relative;}
+  .fstage{display:flex; align-items:baseline; gap:12px; border:1px solid var(--line);
+    border-radius:8px; padding:10px 14px; background:var(--paper);
+    opacity:.35; transform:translateX(-6px); transition:all .5s var(--ease);}
+  .fstage.lit{opacity:1; transform:none; border-color:var(--acc);}
+  .fnum{font:700 clamp(20px,4vw,28px)/1 Georgia, serif; color:var(--acc); font-variant-numeric:tabular-nums; min-width:3.2em;}
+  .flbl{font-size:13.5px; color:var(--mut);}
+  .floop{display:flex; align-items:center; gap:8px; margin-top:10px; font:600 12px var(--mono); color:var(--amber);}
+  .floop svg{width:16px; height:16px; animation:spin 6s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion: reduce){ .floop svg{animation:none;} }
+  .fscale{margin-top:14px; padding-top:12px; border-top:1px dashed var(--line); font-size:14px;}
+
+  /* EXHIBIT D — journey */
+  .journey{display:grid; grid-template-columns:auto 1fr; gap:22px; align-items:start;}
+  @media(max-width:600px){.journey{grid-template-columns:1fr;}}
+  .portrait{width:132px; height:132px; border-radius:12px; object-fit:cover; display:block;
+    filter:grayscale(1) contrast(1.08); border:1px solid var(--line);}
+  .portrait-wrap{position:relative; width:132px;}
+  .portrait-wrap::after{content:""; position:absolute; inset:0; border-radius:12px;
+    background:linear-gradient(160deg, rgba(22,107,71,.28), transparent 60%); pointer-events:none;}
+  .route{list-style:none; margin:2px 0 0;}
+  .route li{position:relative; padding:0 0 16px 22px; border-left:2px solid var(--line);
+    opacity:0; transform:translateY(8px); transition:all .5s var(--ease);}
+  .route li:last-child{border-left-color:transparent; padding-bottom:2px;}
+  .route.go li{opacity:1; transform:none;}
+  .route li::before{content:""; position:absolute; left:-7px; top:3px; width:12px; height:12px;
+    border-radius:50%; background:var(--card); border:2.5px solid var(--acc);}
+  .route li:last-child::before{background:var(--acc);}
+  .route b{display:block; font-size:14.5px;}
+  .route span{font-size:13px; color:var(--mut);}
+
+  /* EXHIBIT E — five layers, runnable */
+  .runbar{display:flex; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap;}
+  .runbtn{all:unset; cursor:pointer; font:700 13px var(--mono); color:#fff; background:var(--acc);
+    border-radius:7px; padding:13px 18px;}
+  .runbtn:hover{opacity:.9;}
+  .runout{font:600 12.5px var(--mono); color:var(--mut); min-height:1em;}
   .layers{display:flex; flex-direction:column; gap:8px;}
-  .layer{border:1px solid var(--line); border-radius:8px; background:var(--paper); overflow:hidden;}
+  .layer{border:1px solid var(--line); border-radius:8px; background:var(--paper); overflow:hidden;
+    transition:border-color .3s;}
+  .layer.pass{border-color:var(--acc);}
+  .layer.warn{border-color:var(--amber);}
   .layer button{
     all:unset; display:flex; width:100%; justify-content:space-between; align-items:center;
     flex-wrap:wrap; gap:2px 12px; box-sizing:border-box;
     padding:11px 14px; cursor:pointer; font-size:14.5px; font-weight:600; color:var(--ink);
   }
   .layer button:hover{background:var(--acc-soft);}
-  .layer .verdict{font-family:ui-monospace, Menlo, monospace; font-size:12px; color:var(--acc);}
+  .layer .verdict{font:600 12px var(--mono); color:var(--mut);}
+  .layer.pass .verdict{color:var(--acc);}
+  .layer.warn .verdict{color:var(--amber);}
   .layer .why{display:none; padding:0 14px 12px; font-size:14px; color:var(--mut);}
   .layer.open .why{display:block;}
-  .layers-foot{margin-top:10px; font-size:13.5px; color:var(--mut);}
+  .layers-foot{margin-top:12px; font-size:13.5px; color:var(--mut);}
 
-  /* org dots */
-  .orgs{display:grid; grid-template-columns:1fr 1.6fr; gap:18px; margin:22px 0;}
-  @media(max-width:560px){.orgs{grid-template-columns:1fr;}}
-  .org{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px;}
-  .org h3{font-size:13px; font-weight:650; margin-bottom:10px; color:var(--mut); text-transform:uppercase; letter-spacing:.06em;}
-  .dots{display:flex; flex-wrap:wrap; gap:4px;}
-  .dots i{width:9px; height:9px; border-radius:50%; background:var(--acc); display:block;}
+  /* EXHIBIT F — org toggle */
+  .seg{display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; margin-bottom:16px;}
+  .seg button{all:unset; cursor:pointer; font:600 13px var(--mono); padding:8px 14px; color:var(--mut);}
+  .seg button.on{background:var(--acc); color:#fff;}
+  .orgview .headline{font-family:Georgia, serif; font-size:19px; margin-bottom:10px;}
+  .dots{display:flex; flex-wrap:wrap; gap:4px; align-content:flex-start;}
+  .dots i{width:9px; height:9px; border-radius:50%; background:var(--acc); display:block;
+    animation:pop .4s var(--ease) backwards;}
   .dots i.lite{background:transparent; border:1.5px solid var(--acc); opacity:.55;}
-  .dots i.me{background:var(--ink); outline:2px solid var(--acc); outline-offset:1px;}
-  .org p{font-size:13px; color:var(--mut); margin:10px 0 0;}
+  .dots i.me{width:11px; height:11px; background:var(--card); border:2.5px solid var(--acc);
+    box-shadow:0 0 0 2px var(--card);}
+  @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+  .orgnote{font-size:13px; color:var(--mut); margin-top:10px;}
+  .orgstat{font:600 12px var(--mono); color:var(--amber); margin-top:12px;}
 
-  .sig{font-family:Georgia, serif; font-size:19px; margin-top:6px;}
-  .contact{margin-top:14px;}
+  .sig{font-family:Georgia, serif; font-size:20px; margin-top:4px;}
+  .contact{margin-top:16px;}
   .contact a{
     display:inline-block; border:1.5px solid var(--acc); color:var(--acc); text-decoration:none;
-    padding:9px 18px; border-radius:7px; font-weight:600; font-size:15px; margin:0 10px 10px 0;
-  }
+    padding:10px 20px; border-radius:8px; font-weight:600; font-size:15px; margin:0 10px 10px 0;
+    transition:all .2s;}
   .contact a:hover{background:var(--acc); color:#fff;}
 
-  footer{border-top:1px solid var(--line); margin-top:40px; padding:30px 0 10px; font-size:14.5px; color:var(--mut);}
-  footer h2{font-size:17px; font-family:-apple-system, sans-serif; letter-spacing:.02em;}
-  footer p{margin-bottom:12px;}
+  footer.sec{font-size:14.5px; color:var(--mut); margin-bottom:0;}
+  footer.sec h2{font-size:clamp(19px,3vw,23px);}
+  .trail{font:600 11.5px var(--mono); color:var(--mut); letter-spacing:.04em; margin-top:14px;
+    display:flex; flex-wrap:wrap; gap:6px 0;}
+  .trail span{white-space:nowrap;}
+  .trail span:not(:last-child)::after{content:"·"; margin:0 8px; color:var(--acc);}
 
-  .reveal{opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s ease;}
+  .reveal{opacity:0; transform:translateY(16px); transition:opacity .7s var(--ease), transform .7s var(--ease);}
   .reveal.in{opacity:1; transform:none;}
   @media (prefers-reduced-motion: reduce){
     .reveal{opacity:1; transform:none; transition:none;}
-    #revsvg path.rev{stroke-dashoffset:0; transition:none;}
-    .loop .writeback{animation:none;}
+    .route li{opacity:1; transform:none; transition:none;}
+    .cnode, .fstage{transition:none;}
+    .dots i{animation:none;}
   }
 </style>
 </head>
 <body>
 <div id="progress"></div>
+
+<nav id="rail" aria-label="Sections">
+  <a href="#p1"><span class="tick"></span><span class="lbl">PROOF 01</span></a>
+  <a href="#p2"><span class="tick"></span><span class="lbl">PROOF 02</span></a>
+  <a href="#p3"><span class="tick"></span><span class="lbl">PROOF 03</span></a>
+  <a href="#origin"><span class="tick"></span><span class="lbl">ORIGIN</span></a>
+  <a href="#clock"><span class="tick"></span><span class="lbl">OFF THE CLOCK</span></a>
+  <a href="#lead"><span class="tick"></span><span class="lbl">HOW I LEAD</span></a>
+  <a href="#who"><span class="tick"></span><span class="lbl">SIGNATURE</span></a>
+  <a href="#colophon"><span class="tick"></span><span class="lbl">COLOPHON</span></a>
+</nav>
+
 <main>
 
 <header class="hero">
-  <h1>I make the revenue call, then I build the system that proves it.</h1>
+  <div class="kicker">BOER CHEN · OPERATING REVIEW</div>
+  <h1>I make the revenue call, then I build the system that <em>proves</em> it.</h1>
   <div class="statline">
-    <span><b class="num">$0 → $5M</b>&nbsp;and an acquisition</span><span class="dot">·</span>
-    <span>a <b class="num">$100M</b>, six-brand unit today</span><span class="dot">·</span>
+    <span><b class="num">$0 → $5M</b> and an acquisition</span>
+    <span>a <b class="num">$100M</b>, six-brand unit today</span>
     <span>every system below, <b>I built</b></span>
   </div>
   <p class="readnote">Proof first, story after. Three minutes.</p>
 </header>
 
-<section class="reveal">
-  <span class="stopmark"></span>
+<section class="reveal" id="p1">
+  <div class="kicker">PROOF 01 · BOSTON INSTITUTE OF FINANCE</div>
   <h2>$0 to $5M, then an acquisition</h2>
   <p>Boston Institute of Finance: education for wealth-management firms, registered investment advisors and banks. Regulated finance, where a compliance mistake costs the license, not the deal. The company had essentially no business when we took it over.</p>
   <p>By the end I ran it as director of revenue operations and de facto COO. Everyone except the CEO ran on my plan, and everyone was ten people, counting the admin and the accountant. Product, demand generation, retention, reporting, budget: one owner.</p>
 
-  <figure class="panel">
-    <svg id="revsvg" viewBox="0 0 600 190" width="100%" role="img" aria-label="Revenue line from zero to five million dollars, ending in acquisition">
-      <line x1="40" y1="160" x2="580" y2="160" stroke="var(--line)" stroke-width="1"/>
-      <path class="rev" d="M40,158 L120,155 L200,148 L280,134 L360,110 L440,74 L520,38 L560,24"/>
-      <circle cx="560" cy="24" r="4" fill="var(--acc)"/>
-      <text x="40" y="178">$0</text>
-      <text x="300" y="178" text-anchor="middle">ten people, one plan, one budget</text>
-      <text x="560" y="178" text-anchor="end">$5M</text>
-      <text class="big" x="556" y="14" text-anchor="end">acquired ↗</text>
-    </svg>
-    <figcaption>Revenue at Boston Institute of Finance, from essentially nothing to $5M and an acquisition by Colibri Group.</figcaption>
+  <figure class="exhibit">
+    <div class="exhibit-tag">Exhibit A · The number</div>
+    <div class="counter" id="bigcount" aria-label="Five million dollars">$0</div>
+    <div class="counter-base">from essentially nothing · exit: acquired by Colibri Group</div>
+    <div class="chips">
+      <span class="chip"><b>10 people</b>, incl. the admin and the accountant</span>
+      <span class="chip"><b>4 functions</b>, one plan, one budget</span>
+      <span class="chip"><b>1 integration</b>, led into the buyer</span>
+    </div>
+    <button class="replay" id="replay">↻ run the count again</button>
+    <figcaption>No chart here on purpose. Four years of monthly revenue belongs to the company; the outcome is mine to show.</figcaption>
   </figure>
 
-  <p>Revenue went from nothing to <span class="num">$5M</span>, Colibri Group acquired the company, and I led the integration. Ten people to $5M in a regulated market. The plan was mine, and so was the machine under it.</p>
+  <p>Ten people to $5M in a regulated market is the proudest math of my career. The plan was mine, and so was the machine under it.</p>
 </section>
 
-<section class="reveal">
-  <span class="stopmark"></span>
+<section class="reveal" id="p2">
+  <div class="kicker">PROOF 02 · COLIBRI GROUP</div>
   <h2>Six brands, one brain</h2>
   <p>Today I am Director of Business Operations for a $100M unit at Colibri Group, professional education in regulated industries. My direct team is about 25. Roughly 150 people across marketing, sales and engineering run on the plans my team sets.</p>
-  <p>The six brands all live in financial services, and they are still drastically different businesses: wealth management, insurance, banking, each with its own model, workflow and vocabulary. No amount of status meetings keeps that in one head. So I built the unit a brain. An AI model is a good reasoner and a terrible place to store the truth, so the brain is not the model: it is a plain, versioned knowledge base the agents reason against, and whatever a conversation teaches me is written back the same day. It compounds. Documents start accurate. And because shared numbers are the same discipline, a large part of my job is making six brands agree on one set of them.</p>
+  <p>The six brands all live in financial services, and they are still drastically different businesses: wealth management, insurance, banking, each with its own model, workflow and vocabulary. No amount of status meetings keeps that in one head. So I built the unit a brain. An AI model is a good reasoner and a terrible place to store the truth, so the brain is not the model: it is a plain, versioned knowledge base the agents reason against, and whatever a conversation teaches me is written back the same day. It compounds. And because shared numbers are the same discipline, a large part of my job is making six brands agree on one set of them.</p>
 
-  <figure class="panel">
-    <div class="brain">
+  <figure class="exhibit">
+    <div class="exhibit-tag">Exhibit B · The loop, running</div>
+    <div class="brainwrap">
+      <div class="cycle" id="cycle">
+        <div class="cnode" data-i="0"><span class="cn">01</span>I work a question with the agents</div>
+        <div class="cnode" data-i="1"><span class="cn">02</span>They read the brain before answering</div>
+        <div class="cnode" data-i="2"><span class="cn">03</span>The answer starts accurate, not blank</div>
+        <div class="cnode" data-i="3"><span class="cn">04</span>What we learned is written back in</div>
+        <div class="cyc-note"><span class="live"></span>the brain knows more than it did last week</div>
+      </div>
       <div class="files">
         <b>brain/</b><br>
         ├ brands/<br>
@@ -176,81 +282,115 @@
         │ └ … three more brands<br>
         ├ terms/<b>glossary.md</b><br>
         ├ owners/<b>who-owns-what.md</b><br>
-        └ decisions/<span class="new">2026-07-pricing-call.md ← new</span>
-      </div>
-      <div class="loop">
-        <div class="step">I work a question with the agents</div>
-        <div class="arrow">↓ they read the brain first</div>
-        <div class="step">Answer starts accurate, not blank</div>
-        <div class="arrow writeback">↓ what we learned is written back</div>
-        <div class="step"><b>The brain knows more than last week</b></div>
+        └ decisions/<span class="new" id="newfile">2026-07-pricing-call.md ← new</span>
       </div>
     </div>
-    <figcaption>Sanitized mock. Brand names are fake; the structure and the loop are real.</figcaption>
+    <figcaption>Sanitized mock, live loop. Brand names are fake; the cycle you are watching is the real architecture.</figcaption>
   </figure>
 </section>
 
-<section class="reveal">
-  <span class="stopmark"></span>
+<section class="reveal" id="p3">
+  <div class="kicker">PROOF 03 · THE TAM MACHINE</div>
   <h2>A market map that refreshes itself</h2>
-  <p>One build in full. I needed to rank the insurance-education market by licensed agents per company. My first thesis was wrong: I ranked by agent dropout, the data would not carry it, and I killed it. The rebuilt version is a table in Clay, a go-to-market data tool, that reads the Texas regulator's public feed, aggregates per company, and re-pulls monthly. Nobody maintains it. It surfaced <span class="num">46</span> carriers selling through one distributor, and that set the segmentation and the outreach.</p>
+  <p>One build in full. I needed to rank the insurance-education market: which agencies hold the most licensed-agent appointments. My first thesis was wrong. I ranked by agent dropout, the data would not carry it, and I killed it and rebuilt on volume.</p>
+  <p>The machine reads the Texas insurance regulator's public feed directly and has the regulator's own servers do the aggregation. It gates out the shells, the expired and the sub-scale, scores every agency 0 to 100, and re-pulls the feed monthly. Nothing is pasted in. Nobody maintains it.</p>
+
+  <figure class="exhibit">
+    <div class="exhibit-tag">Exhibit C · The pipeline, end to end</div>
+    <div class="funnel" id="funnel">
+      <div class="fstage"><span class="fnum" data-n="34739">34,739</span><span class="flbl">agencies in, from the regulator's live feed</span></div>
+      <div class="fstage"><span class="fnum" data-n="21678">21,678</span><span class="flbl">remain after the gates: shells, expired licenses and sub-scale shops cut</span></div>
+      <div class="fstage"><span class="fnum" data-n="1497">1,497</span><span class="flbl">make the ranked table, each scored 0–100 on fit</span></div>
+    </div>
+    <div class="floop">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+      re-pulls the feed monthly, on its own
+    </div>
+    <div class="fscale">The machine does not care how big the feed is. Swap the free state feed for the national one and <b>this exact table runs the country</b>. That is the point of building it this way.</div>
+    <figcaption>Built in Clay, a go-to-market data tool. Aggregation runs on the regulator's servers, so the table stays fast at any scale.</figcaption>
+  </figure>
 </section>
 
-<section class="reveal">
-  <span class="stopmark"></span>
+<section class="reveal" id="origin">
+  <div class="kicker">ORIGIN · HOW THE SEAT GOT BUILT</div>
   <h2>Where I come from</h2>
+
+
   <p>Psychology at Fudan University in Shanghai, QS top 30 in the world, the Ivy League's neighborhood. Then a master's in new media management at Syracuse. A visa note: almost no Chinese graduate outside engineering gets to stay in the US. Of my Chinese classmates, none did. I stayed on work that proved itself.</p>
-  <p>First job: design. Then self-taught code, shipping client websites in HTML, PHP and JavaScript. Then marketing across an incubator's portfolio: retail brands sold into Whole Foods and Costco, wholesale goods, a film library holding one of Bruce Lee's films, and the finance-education firm that became the story above. Every company was a new business to read fast. That is why six brands do not scare me.</p>
+  <p>First job: design. Then self-taught code, shipping client websites in HTML, PHP and JavaScript. Then marketing across an incubator's portfolio: retail brands sold into Whole Foods and Costco, wholesale goods, a film library holding one of Bruce Lee's films, and the finance-education firm that became Proof 01. Every company was a new business to read fast. That is why six brands do not scare me.</p>
+
+  <figure class="exhibit context">
+    <div class="exhibit-tag">Exhibit D · The route (context)</div>
+    <div class="journey">
+      <div class="portrait-wrap" id="pwrap">
+        <img class="portrait" id="portrait" src="headshot.jpg" alt="Boer Chen">
+      </div>
+      <ol class="route" id="route">
+        <li><b>Shanghai · Fudan University</b><span>psychology, QS top 30 worldwide</span></li>
+        <li><b>Syracuse</b><span>master's, new media management · stayed against the visa odds</span></li>
+        <li><b>Boston · the incubator</b><span>design → code → marketing, four industries</span></li>
+        <li><b>Boston Institute of Finance</b><span>$0 → $5M, acquired · Proof 01</span></li>
+        <li><b>Colibri Group · today</b><span>the $100M, six-brand unit · Proofs 02 and 03</span></li>
+      </ol>
+    </div>
+  </figure>
 </section>
 
-<section class="reveal">
-  <span class="stopmark"></span>
-  <h2>Off the clock</h2>
-  <p>I built the investing agent that clears my own trades. Five layers, because any single source of conviction will lie to you. Each is a separate witness checking a different way to be wrong. Tap them:</p>
+<section class="reveal" id="clock">
+  <div class="kicker">OFF THE CLOCK · SAME LOOP, MY OWN MONEY</div>
+  <h2>The agent that clears my trades</h2>
+  <p>I like investing, so I built the agent that has to clear my own trades. Five layers, because any single source of conviction will lie to you. Each layer is a separate witness checking a different way to be wrong.</p>
 
-  <figure class="panel">
+  <figure class="exhibit context">
+    <div class="exhibit-tag">Exhibit E · Run the check (personal build)</div>
+    <div class="runbar">
+      <button class="runbtn" id="runcheck">▶ Run the five layers</button>
+      <span class="runout" id="runout"></span>
+    </div>
     <div class="layers" id="layers">
-      <div class="layer"><button>1 · Price movement <span class="verdict">what the market is doing</span></button>
+      <div class="layer"><button>1 · Price movement <span class="verdict" data-idle="what the market is doing" data-done="✓ trend intact">what the market is doing</span></button>
         <div class="why">The chart does not tell you if the company is good. It tells you what everyone else already believes, and whether you are early or late to believe it.</div></div>
-      <div class="layer"><button>2 · Business health <span class="verdict">does it earn its keep</span></button>
+      <div class="layer"><button>2 · Business health <span class="verdict" data-idle="does it earn its keep" data-done="✓ earns its keep">does it earn its keep</span></button>
         <div class="why">Revenue, margins, cash. A great story with weak numbers is a donation, not an investment.</div></div>
-      <div class="layer"><button>3 · Valuation <span class="verdict">am I overpaying</span></button>
+      <div class="layer"><button>3 · Valuation <span class="verdict" data-idle="am I overpaying" data-done="✓ price defensible">am I overpaying</span></button>
         <div class="why">A good company at the wrong price is a bad decision. This layer exists to stop me from paying any price for a story I like.</div></div>
-      <div class="layer"><button>4 · Analyst view <span class="verdict">what the professionals think</span></button>
+      <div class="layer"><button>4 · Analyst view <span class="verdict" data-idle="what the professionals think" data-done="✓ split, and I know where I differ">what the professionals think</span></button>
         <div class="why">Not because analysts are right, but because knowing where I disagree with them tells me exactly what I am betting on.</div></div>
-      <div class="layer"><button>5 · Crowd behavior <span class="verdict">who else is piling in</span></button>
+      <div class="layer" data-warn="1"><button>5 · Crowd behavior <span class="verdict" data-idle="who else is piling in" data-done="⚠ crowd agrees too loudly">who else is piling in</span></button>
         <div class="why">The strange one. When the crowd agrees with me too loudly, I read it as a warning, not a confirmation.</div></div>
     </div>
-    <p class="layers-foot">Five agree, I act. They argue, I size small or walk. Most mornings its real job is talking me out of something.</p>
-    <figcaption>Mocked-up view of my personal stock agent's checklist. The framework is real; my portfolio stays private.</figcaption>
+    <p class="layers-foot">Five agree, I act. They argue, I size small or walk. Most mornings its real job is talking me out of something. Tap any layer for the reasoning.</p>
+    <figcaption>Mocked-up run of my personal stock agent. The framework is real; my portfolio stays private.</figcaption>
   </figure>
 
-  <p>My wife and I also collect sneakers, so I built an app that scans a shoebox and fills in the shoe and its market price. The boxes were winning.</p>
+  <p>Also off the clock: my wife and I collect sneakers, so I built an app that scans a shoebox and fills in the shoe and its market price. The boxes were winning.</p>
 </section>
 
-<section class="reveal">
-  <span class="stopmark"></span>
-  <h2>How I lead</h2>
-  <p>Clear is kind. Disagreement means we go find the data. No data means we run a test, and the test settles it. If I am wrong, I am wrong, and the team knows it. That is why the wins carry weight.</p>
+<section class="reveal" id="lead">
+  <div class="kicker">HOW I LEAD · TWO SHAPES</div>
+  <h2>Clear is kind</h2>
+  <p>Disagreement means we go find the data. No data means we run a test, and the test settles it. If I am wrong, I am wrong, and the team knows it. That is why the wins carry weight.</p>
 
-  <div class="orgs">
-    <div class="org">
-      <h3>BIF · the one leader</h3>
-      <div class="dots" id="dots-bif" aria-label="Ten people, one of them me"></div>
-      <p>Ten people, everyone on one plan. $5M.</p>
+  <figure class="exhibit">
+    <div class="exhibit-tag">Exhibit F · The org, to scale</div>
+    <div class="seg" role="tablist">
+      <button class="on" id="segbif" role="tab">BIF · 2021–24</button>
+      <button id="segcol" role="tab">Colibri · today</button>
     </div>
-    <div class="org">
-      <h3>Colibri · one of several</h3>
-      <div class="dots" id="dots-col" aria-label="Twenty-five direct, one hundred fifty cross-functional"></div>
-      <p>25 direct, ~150 across marketing, sales and engineering on my team's plans.</p>
+    <div class="orgview">
+      <div class="headline" id="orghead">The one leader: 10 people, one plan, $5M.</div>
+      <div class="dots" id="orgdots" aria-live="polite"></div>
+      <p class="orgnote" id="orgnote">Everyone except the CEO. The ringed dot is me.</p>
+      <div class="orgstat">10 people then · 175 in the room today</div>
     </div>
-  </div>
+    <figcaption>Tap the tabs. Same person, two very different rooms.</figcaption>
+  </figure>
 
-  <p>Two shapes so far, and the style holds at both sizes: people stop guessing when they trust the number in front of them.</p>
+  <p>The style holds at both sizes: people stop guessing when they trust the number in front of them.</p>
 </section>
 
-<section class="reveal">
-  <span class="stopmark"></span>
+<section class="reveal" id="who">
+  <div class="kicker">SIGNATURE</div>
   <h2>Who is writing this</h2>
   <p class="sig">I am Boer Chen.</p>
   <p>Over a decade of operating, from a psychology classroom in China to a $100M unit, with one company taken from nothing to $5M and through its acquisition. I decide with evidence, I build the systems that produce it, and I lead teams that stop guessing. Open to the right role.</p>
@@ -260,47 +400,148 @@
   </div>
 </section>
 
-<footer class="reveal">
-  <h2>Colophon: how this site was made</h2>
+<footer class="sec reveal" id="colophon">
+  <div class="kicker">COLOPHON</div>
+  <h2>How this site was made</h2>
   <p>Every fact here is mine and checked. The loop tested whether you would understand them: agents drafted this page several ways, other agents read each version cold like a stranger, and the failing versions were rewritten until the cold reads came back right. Even the section order was chosen by cold readers, not by me. It is the same loop I run at work: propose, verify against a reader who does not flatter you, keep what survives. Built with Claude Code.</p>
+  <div class="trail"><span>3 drafts</span><span>9 cold reads</span><span>2 orders A/B tested</span><span>1 false claim caught &amp; cut</span><span>detector-checked</span></div>
 </footer>
 
 </main>
 <script>
-  // reading progress
+(function(){
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // progress bar
   const bar = document.getElementById('progress');
   addEventListener('scroll', () => {
     const h = document.documentElement;
     bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
-  }, {passive: true});
+  }, {passive:true});
 
-  // reveal + revenue draw
-  const io = new IntersectionObserver(es => es.forEach(e => {
+  // rail highlight
+  const railLinks = [...document.querySelectorAll('#rail a')];
+  const secObs = new IntersectionObserver(es => es.forEach(e => {
     if (e.isIntersecting) {
-      e.target.classList.add('in');
-      const svg = e.target.querySelector('#revsvg');
-      if (svg) svg.classList.add('drawn');
-      io.unobserve(e.target);
+      railLinks.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id));
     }
-  }), {threshold: 0.12});
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  }), {rootMargin:'-40% 0px -55% 0px'});
+  document.querySelectorAll('section[id], footer[id]').forEach(s => secObs.observe(s));
 
-  // five layers
-  document.querySelectorAll('#layers .layer button').forEach(b =>
-    b.addEventListener('click', () => b.parentElement.classList.toggle('open')));
-
-  // org dots
-  function dots(id, filled, lite, meIndex){
-    const box = document.getElementById(id);
-    for (let i = 0; i < filled + lite; i++){
-      const d = document.createElement('i');
-      if (i === meIndex) d.className = 'me';
-      else if (i >= filled) d.className = 'lite';
-      box.appendChild(d);
+  // reveals + per-exhibit triggers
+  let ioFired = false;
+  function enter(el){
+    el.classList.add('in');
+    if (el.id === 'p1') runCounter();
+    if (el.id === 'p3') litFunnel();
+    if (el.id === 'origin') {
+      const route = document.getElementById('route');
+      [...route.children].forEach((li, i) => li.style.transitionDelay = (reduced ? 0 : i * 180) + 'ms');
+      route.classList.add('go');
     }
   }
-  dots('dots-bif', 10, 0, 0);
-  dots('dots-col', 25, 150, 0);
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    ioFired = true;
+    enter(e.target);
+    io.unobserve(e.target);
+  }), {threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  // safety net: some embedded browsers never deliver observer callbacks
+  setTimeout(() => {
+    if (!ioFired) document.querySelectorAll('.reveal:not(.in)').forEach(enter);
+  }, 1500);
+
+  // EXHIBIT A — counter
+  const big = document.getElementById('bigcount');
+  function runCounter(){
+    const target = 5000000, dur = reduced ? 0 : 1900, t0 = performance.now();
+    function tick(t){
+      const k = dur === 0 ? 1 : Math.max(0, Math.min((t - t0) / dur, 1));
+      const eased = 1 - Math.pow(1 - k, 3);
+      big.textContent = '$' + Math.round(target * eased).toLocaleString('en-US');
+      if (k < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+    setTimeout(() => { big.textContent = '$' + target.toLocaleString('en-US'); }, dur + 150);
+  }
+  document.getElementById('replay').addEventListener('click', runCounter);
+
+  // EXHIBIT B — brain cycle
+  const nodes = [...document.querySelectorAll('#cycle .cnode')];
+  const newfile = document.getElementById('newfile');
+  let ci = 0;
+  if (!reduced && nodes.length) setInterval(() => {
+    nodes.forEach(n => n.classList.remove('hot'));
+    nodes[ci % 4].classList.add('hot');
+    newfile.classList.toggle('show', ci % 4 === 3);
+    ci++;
+  }, 1300);
+  else { nodes.forEach(n => n.classList.add('hot')); newfile.classList.add('show'); }
+
+  // EXHIBIT C — funnel
+  function litFunnel(){
+    const stages = [...document.querySelectorAll('#funnel .fstage')];
+    stages.forEach((s, i) => setTimeout(() => {
+      s.classList.add('lit');
+      const numEl = s.querySelector('.fnum'), n = +numEl.dataset.n;
+      const dur = reduced ? 0 : 700, t0 = performance.now();
+      (function tick(t){
+        const k = dur === 0 ? 1 : Math.max(0, Math.min((t - t0) / dur, 1));
+        numEl.textContent = Math.round(n * (1 - Math.pow(1 - k, 3))).toLocaleString('en-US');
+        if (k < 1) requestAnimationFrame(tick);
+      })(t0);
+      setTimeout(() => { numEl.textContent = n.toLocaleString('en-US'); }, dur + 150);
+    }, reduced ? 0 : i * 450));
+  }
+
+  // EXHIBIT D — portrait fallback
+  const img = document.getElementById('portrait');
+  img.addEventListener('error', () => document.getElementById('pwrap').remove());
+
+  // EXHIBIT E — runnable layers
+  const layerEls = [...document.querySelectorAll('#layers .layer')];
+  layerEls.forEach(l => l.querySelector('button').addEventListener('click', () => l.classList.toggle('open')));
+  document.getElementById('runcheck').addEventListener('click', () => {
+    const out = document.getElementById('runout');
+    out.textContent = 'running…';
+    layerEls.forEach(l => { l.classList.remove('pass','warn'); const v = l.querySelector('.verdict'); v.textContent = v.dataset.idle; });
+    layerEls.forEach((l, i) => setTimeout(() => {
+      const warn = l.dataset.warn === '1';
+      l.classList.add(warn ? 'warn' : 'pass');
+      const v = l.querySelector('.verdict');
+      v.textContent = v.dataset.done;
+      if (i === layerEls.length - 1) out.textContent = '4 agree, 1 argues → size small.';
+    }, reduced ? 0 : 380 * (i + 1)));
+  });
+
+  // EXHIBIT F — org toggle
+  const orgdots = document.getElementById('orgdots'), orghead = document.getElementById('orghead'),
+        orgnote = document.getElementById('orgnote'),
+        segbif = document.getElementById('segbif'), segcol = document.getElementById('segcol');
+  function renderOrg(mode){
+    orgdots.innerHTML = '';
+    const filled = mode === 'bif' ? 10 : 25, lite = mode === 'bif' ? 0 : 150;
+    for (let i = 0; i < filled + lite; i++){
+      const d = document.createElement('i');
+      if (i === 0) d.className = 'me';
+      else if (i >= filled) d.className = 'lite';
+      if (!reduced) d.style.animationDelay = Math.min(i * 6, 500) + 'ms';
+      orgdots.appendChild(d);
+    }
+    orghead.textContent = mode === 'bif'
+      ? 'The one leader: 10 people, one plan, $5M.'
+      : 'One of several: 25 direct, ~150 cross-functional on my team’s plans.';
+    orgnote.textContent = mode === 'bif'
+      ? 'Everyone except the CEO. The dark dot is me.'
+      : 'Solid dots report to me; open dots run on the plans. The dark dot is still me.';
+    segbif.classList.toggle('on', mode === 'bif');
+    segcol.classList.toggle('on', mode !== 'bif');
+  }
+  segbif.addEventListener('click', () => renderOrg('bif'));
+  segcol.addEventListener('click', () => renderOrg('col'));
+  renderOrg('bif');
+})();
 </script>
 </body>
 </html>
