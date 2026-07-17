@@ -11,14 +11,11 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23166b47'/%3E%3Ctext x='16' y='22' font-family='Georgia' font-size='17' fill='%23fff' text-anchor='middle' font-weight='bold'%3EB%3C/text%3E%3C/svg%3E">
 <style>
   :root{
-    --paper:#f7f5f1; --ink:#16181d; --mut:#5d6066; --line:#e0ddd5;
-    --acc:#166b47; --acc-soft:#e5efe9; --amber:#b0812a; --card:#fffefb;
+    color-scheme: dark;
+    --paper:#0f1411; --ink:#e6e9e1; --mut:#96a097; --line:#232b24;
+    --acc:#57bb8d; --acc-soft:#152319; --amber:#cfa14b; --card:#161d18;
     --mono:ui-monospace, "SF Mono", Menlo, monospace;
     --ease:cubic-bezier(.22,.9,.3,1);
-  }
-  @media (prefers-color-scheme: dark){
-    :root{ --paper:#111316; --ink:#eae8e2; --mut:#9b9ea6; --line:#272a2f;
-           --acc:#4fb586; --acc-soft:#17251e; --amber:#d3a44f; --card:#191c20; }
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
@@ -82,7 +79,8 @@
   .exhibit-tag{
     font:700 10px/1 var(--mono); letter-spacing:.16em; color:var(--amber);
     text-transform:uppercase; margin-bottom:16px;
-    padding-bottom:10px; border-bottom:1px solid var(--line);
+    display:inline-block; padding:5px 10px 4px;
+    border:1.5px solid currentColor; border-radius:4px;
   }
   .exhibit.context{border-style:dashed;}
   .exhibit.context .exhibit-tag{color:var(--mut);}
