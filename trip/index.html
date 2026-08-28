@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Dashboard</title>
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.23.9/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; }
+        .timeline-container { border-left: 2px solid #e2e8f0; margin-left: 1.5rem; padding-left: 2rem; position: relative; }
+        .timeline-dot { width: 28px; height: 28px; border-radius: 50%; background-color: #0ea5e9; color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; position: absolute; left: -2rem; transform: translateX(-50%); border: 4px solid #f8fafc; }
+        .card-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 20px; flex-shrink: 0; }
+
+        /* Password gate */
+        #gate { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center;
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 1.5rem; }
+        #gate .card { background: #ffffff; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
+                      width: 100%; max-width: 380px; padding: 2rem; text-align: center; }
+        #gate h1 { font-size: 1.25rem; font-weight: 700; color: #0f172a; margin: .75rem 0 .25rem; }
+        #gate p  { font-size: .85rem; color: #64748b; margin-bottom: 1.25rem; }
+        #gate .lock { font-size: 2.5rem; }
+        #gate input { width: 100%; padding: .75rem 1rem; border: 1px solid #cbd5e1; border-radius: 10px;
+                      font-size: 1rem; outline: none; transition: border-color .15s, box-shadow .15s; }
+        #gate input:focus { border-color: #0ea5e9; box-shadow: 0 0 0 3px rgba(14,165,233,.2); }
+        #gate button { width: 100%; margin-top: .75rem; padding: .75rem 1rem; border: none; border-radius: 10px;
+                       background: #0f172a; color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer;
+                       transition: background .15s, opacity .15s; }
+        #gate button:hover { background: #1e293b; }
+        #gate button:disabled { opacity: .6; cursor: not-allowed; }
+        #gate .err { color: #dc2626; font-size: .85rem; margin-top: .75rem; min-height: 1.1rem; }
+    </style>
+</head>
+<body>
+    <!-- Password gate (shown first; the trip data is encrypted until unlocked) -->
+    <div id="gate">
+        <form class="card" id="gate-form" autocomplete="off">
+            <div class="lock">🔒</div>
+            <h1>Family Trip Dashboard</h1>
+            <p>Enter the password to view the itinerary and budget.</p>
+            <input id="gate-pw" type="password" placeholder="Password" autofocus autocomplete="current-password" />
+            <button id="gate-btn" type="submit">Unlock</button>
+            <div class="err" id="gate-err"></div>
+        </form>
+    </div>
+
+    <div id="root" style="display:none"></div>
+
+    <!-- Encrypted payload: only ciphertext ships. Password is never stored here. -->
+    <script id="payload" type="application/json">{"v":1,"kdf":"PBKDF2-SHA256","iter":250000,"cipher":"AES-GCM","salt":"cgS9nA3SPiQ/Y1ggQNsPhg==","iv":"Zzpv2bKXDUb9yp3Z","data":"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"}</script>
+
+    <script>
+        (function () {
+            var PAYLOAD = JSON.parse(document.getElementById('payload').textContent);
+
+            function b64ToBytes(b64) {
+                var bin = atob(b64), u = new Uint8Array(bin.length);
+                for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+                return u;
+            }
+
+            async function decryptTrip(password) {
+                var enc = new TextEncoder();
+                var baseKey = await crypto.subtle.importKey(
+                    'raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
+                var key = await crypto.subtle.deriveKey(
+                    { name: 'PBKDF2', salt: b64ToBytes(PAYLOAD.salt), iterations: PAYLOAD.iter, hash: 'SHA-256' },
+                    baseKey, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+                var plainBuf = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv: b64ToBytes(PAYLOAD.iv) }, key, b64ToBytes(PAYLOAD.data));
+                return JSON.parse(new TextDecoder().decode(plainBuf));
+            }
+
+            function reveal(data) {
+                function go() {
+                    if (!window.mountTrip) { setTimeout(go, 30); return; }
+                    window.mountTrip(data);
+                    document.getElementById('root').style.display = '';
+                    var gate = document.getElementById('gate');
+                    if (gate) gate.remove();
+                }
+                go();
+            }
+
+            var form = document.getElementById('gate-form');
+            var pw = document.getElementById('gate-pw');
+            var btn = document.getElementById('gate-btn');
+            var err = document.getElementById('gate-err');
+
+            // Skip the prompt if already unlocked in this browser tab session.
+            try {
+                var cached = sessionStorage.getItem('tripData');
+                if (cached) { reveal(JSON.parse(cached)); }
+            } catch (e) {}
+
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                err.textContent = '';
+                btn.disabled = true;
+                btn.textContent = 'Unlocking…';
+                try {
+                    var data = await decryptTrip(pw.value);
+                    try { sessionStorage.setItem('tripData', JSON.stringify(data)); } catch (e2) {}
+                    reveal(data);
+                } catch (e3) {
+                    err.textContent = 'Incorrect password. Try again.';
+                    btn.disabled = false;
+                    btn.textContent = 'Unlock';
+                    pw.value = '';
+                    pw.focus();
+                }
+            });
+        })();
+    </script>
+
+    <script type="text/babel" data-presets="react">
+        const { useState, useMemo } = React;
+
+        const Icon = ({ type }) => {
+            const icons = { flight: "✈️", lodging: "🏨", car: "🚗", transit: "🚌" };
+            const colors = { flight: "bg-blue-100 text-blue-600", lodging: "bg-purple-100 text-purple-600", car: "bg-green-100 text-green-600", transit: "bg-orange-100 text-orange-600" };
+            return <div className={`card-icon ${colors[type] || 'bg-gray-100'}`}>{icons[type]}</div>;
+        };
+
+        const Dashboard = ({ tripData }) => {
+            const [lang, setLang] = useState('en');
+            const [tab, setTab] = useState('timeline');
+            const t = tripData[lang];
+
+            const totalUSD = useMemo(() => {
+                return t.budget.reduce((acc, curr) => {
+                    const numStr = curr.cost.replace(/[^\d.-]/g, '');
+                    if (!numStr) return acc;
+                    let val = parseFloat(numStr);
+                    if (curr.cost.includes('CNY')) { val = val / 7.1; }
+                    return acc + val;
+                }, 0);
+            }, [t.budget]);
+
+            const formattedTotal = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalUSD);
+
+            return (
+                <div className="max-w-4xl mx-auto p-6 relative">
+                    <div className="flex justify-between items-center mb-8 border-b pb-4">
+                        <h1 className="text-2xl font-bold text-gray-800">{t.title}</h1>
+                        <div className="flex items-center space-x-4">
+                            <div className="bg-gray-200 p-1 rounded-lg flex text-sm font-medium">
+                                <button onClick={() => setLang('zh')} className={`px-3 py-1 rounded-md transition-colors ${lang === 'zh' ? 'bg-white shadow' : 'text-gray-500 hover:text-gray-700'}`}>中文</button>
+                                <button onClick={() => setLang('en')} className={`px-3 py-1 rounded-md transition-colors ${lang === 'en' ? 'bg-white shadow' : 'text-gray-500 hover:text-gray-700'}`}>English</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex space-x-2 mb-6">
+                        <button onClick={() => setTab('timeline')} className={`px-4 py-2 rounded-lg font-semibold transition-colors ${tab === 'timeline' ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{t.tabs.timeline}</button>
+                        <button onClick={() => setTab('budget')} className={`px-4 py-2 rounded-lg font-semibold transition-colors ${tab === 'budget' ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>{t.tabs.budget}</button>
+                    </div>
+
+                    {tab === 'timeline' && (
+                        <div className="timeline-container mt-8 relative">
+                            {t.phases.map((phase) => (
+                                <div key={phase.id} className="mb-10 relative">
+                                    <div className="timeline-dot">{phase.id}</div>
+                                    <h2 className="text-xl font-bold text-gray-800 mb-4">{phase.title}</h2>
+                                    <div className="space-y-4">
+                                        {phase.items.map((item, idx) => {
+                                            const isMissing = item.status === "待补充" || item.status === "Missing";
+                                            return (
+                                                <div key={idx} className={`p-4 rounded-xl border flex flex-col md:flex-row items-start space-x-0 md:space-x-4 space-y-3 md:space-y-0 bg-white transition-shadow hover:shadow-md ${isMissing ? 'border-yellow-300 shadow-sm' : 'border-gray-200 shadow-sm'}`}>
+                                                    <div className="flex items-center space-x-4 w-full md:w-auto">
+                                                        <Icon type={item.type} />
+                                                        <div className="md:hidden flex items-center space-x-3">
+                                                            <span className="text-sm font-medium text-gray-500">{item.date}</span>
+                                                            <span className={`text-xs px-2 py-1 rounded-full font-bold ${isMissing ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>{item.status}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex-1 w-full">
+                                                        <div className="hidden md:flex items-center space-x-3 mb-1">
+                                                            <span className="text-sm font-medium text-gray-500">{item.date}</span>
+                                                            <span className={`text-xs px-2 py-1 rounded-full font-bold ${isMissing ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>{item.status}</span>
+                                                        </div>
+                                                        <h3 className="font-bold text-gray-900 text-lg">{item.title}</h3>
+                                                        <p className="text-gray-600 text-sm mt-1">{item.desc}</p>
+
+                                                        {(item.confirmation || item.check_in || item.check_out || item.address) && (
+                                                            <div className="mt-3 flex flex-wrap gap-2">
+                                                                {item.confirmation && (
+                                                                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                                                                        🎟️ Conf: {item.confirmation}
+                                                                    </span>
+                                                                )}
+                                                                {item.check_in && (
+                                                                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                                                        🕒 In: {item.check_in}
+                                                                    </span>
+                                                                )}
+                                                                {item.check_out && (
+                                                                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                                                        🕒 Out: {item.check_out}
+                                                                    </span>
+                                                                )}
+                                                                {item.address && (
+                                                                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100 w-full xl:w-auto">
+                                                                        📍 {item.address}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {tab === 'budget' && (
+                        <div className="space-y-6">
+                            <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-xl shadow-md p-6 flex flex-col md:flex-row justify-between items-center text-white">
+                                <div>
+                                    <h3 className="text-lg font-medium text-gray-200">{lang === 'zh' ? '预估总花费' : 'Estimated Total Cost'}</h3>
+                                    <p className="text-sm text-gray-400 mt-1">{lang === 'zh' ? '* 包含 CNY 转换 (汇率约 1 USD ≈ 7.1 CNY)' : '* Includes CNY conversion (approx. 1 USD ≈ 7.1 CNY)'}</p>
+                                </div>
+                                <div className="text-4xl font-bold mt-4 md:mt-0 tracking-tight text-white">
+                                    {formattedTotal}
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-xl border shadow-sm overflow-x-auto">
+                                <table className="w-full text-left border-collapse min-w-[600px]">
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            <th className="p-4 border-b font-semibold text-gray-600 text-sm">{lang === 'zh' ? '分类' : 'Category'}</th>
+                                            <th className="p-4 border-b font-semibold text-gray-600 text-sm">{lang === 'zh' ? '项目' : 'Item'}</th>
+                                            <th className="p-4 border-b font-semibold text-gray-600 text-sm text-right">{lang === 'zh' ? '金额' : 'Cost'}</th>
+                                            <th className="p-4 border-b font-semibold text-gray-600 text-sm">{lang === 'zh' ? '政策与状态' : 'Policy & Status'}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {t.budget.map((b, idx) => (
+                                            <tr key={idx} className="border-b last:border-0 hover:bg-gray-50 transition-colors">
+                                                <td className="p-4 text-sm font-medium">{b.cat}</td>
+                                                <td className="p-4 text-sm text-gray-700">{b.item}</td>
+                                                <td className="p-4 text-sm font-bold text-gray-900 whitespace-nowrap text-right">{b.cost}</td>
+                                                <td className="p-4 text-sm text-gray-600">{b.policy}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        window.mountTrip = (tripData) => {
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(<Dashboard tripData={tripData} />);
+        };
+    </script>
+</body>
+</html>
