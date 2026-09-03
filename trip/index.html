@@ -63,6 +63,7 @@
         (function () {
             var PAYLOAD = null;
             var SYNC_META = null;
+            var UPDATE_PAYLOADS = [];
 
             function b64ToBytes(b64) {
                 var bin = atob(b64), u = new Uint8Array(bin.length);
@@ -81,6 +82,7 @@
 
             async function decryptTrip(password) {
                 var plainBuf;
+                var privateKey = null;
                 if (PAYLOAD.v === 1) {
                     var legacyKey = await derivePasswordKey(password, b64ToBytes(PAYLOAD.salt), PAYLOAD.iter);
                     plainBuf = await crypto.subtle.decrypt(
@@ -92,7 +94,7 @@
                     var privateKeyBytes = await crypto.subtle.decrypt(
                         { name: 'AES-GCM', iv: b64ToBytes(protectedKey.iv) },
                         passwordKey, b64ToBytes(protectedKey.data));
-                    var privateKey = await crypto.subtle.importKey(
+                    privateKey = await crypto.subtle.importKey(
                         'pkcs8', privateKeyBytes, { name: 'RSA-OAEP', hash: 'SHA-256' }, false, ['decrypt']);
                     var rawDataKey = await crypto.subtle.decrypt(
                         { name: 'RSA-OAEP' }, privateKey, b64ToBytes(PAYLOAD.wrappedKey));
@@ -103,7 +105,68 @@
                 } else {
                     throw new Error('Unsupported encrypted payload');
                 }
-                return JSON.parse(new TextDecoder().decode(plainBuf));
+                var trip = JSON.parse(new TextDecoder().decode(plainBuf));
+                if (UPDATE_PAYLOADS.length && !privateKey) throw new Error('TRIP_UPDATE_INVALID');
+                for (var updateIndex = 0; updateIndex < UPDATE_PAYLOADS.length; updateIndex++) {
+                    var updateEnvelope = UPDATE_PAYLOADS[updateIndex];
+                    var updateRawKey = await crypto.subtle.decrypt(
+                        { name: 'RSA-OAEP' }, privateKey, b64ToBytes(updateEnvelope.wrappedKey));
+                    var updateKey = await crypto.subtle.importKey(
+                        'raw', updateRawKey, { name: 'AES-GCM' }, false, ['decrypt']);
+                    var updatePlain = await crypto.subtle.decrypt(
+                        { name: 'AES-GCM', iv: b64ToBytes(updateEnvelope.iv) },
+                        updateKey, b64ToBytes(updateEnvelope.data));
+                    applyUpdate(trip, JSON.parse(new TextDecoder().decode(updatePlain)));
+                }
+                return trip;
+            }
+
+            function itemMatches(item, match) {
+                return Object.keys(match).every(function (key) {
+                    if (key === 'segmentFlight') {
+                        var wanted = String(match[key]).replace(/\s/g, '').toUpperCase();
+                        return Array.isArray(item.segments) && item.segments.some(function (segment) {
+                            return String(segment.flight || '').replace(/\s/g, '').toUpperCase() === wanted;
+                        });
+                    }
+                    if (key === 'titleContains') {
+                        return String(item.title || '').toLowerCase().indexOf(String(match[key]).toLowerCase()) !== -1;
+                    }
+                    return item[key] === match[key];
+                });
+            }
+
+            function applyUpdate(trip, update) {
+                if (!update || update.schemaVersion !== 1 || !Array.isArray(update.operations)) {
+                    throw new Error('TRIP_UPDATE_INVALID');
+                }
+                update.operations.forEach(function (operation) {
+                    var locale = trip[operation.locale];
+                    var collection = locale && locale[operation.collection];
+                    if (!Array.isArray(collection)) throw new Error('TRIP_UPDATE_INVALID');
+                    if (operation.op === 'append' && operation.value) {
+                        collection.push(operation.value);
+                        return;
+                    }
+                    if (operation.op !== 'merge' || !operation.match || !operation.set) {
+                        throw new Error('TRIP_UPDATE_INVALID');
+                    }
+                    var matched = false;
+                    collection.forEach(function (item) {
+                        if (!itemMatches(item, operation.match)) return;
+                        Object.assign(item, operation.set);
+                        if (operation.segmentSet && operation.match.segmentFlight && Array.isArray(item.segments)) {
+                            var wanted = String(operation.match.segmentFlight).replace(/\s/g, '').toUpperCase();
+                            item.segments.forEach(function (segment) {
+                                if (String(segment.flight || '').replace(/\s/g, '').toUpperCase() === wanted) {
+                                    Object.assign(segment, operation.segmentSet);
+                                }
+                            });
+                        }
+                        matched = true;
+                    });
+                    if (!matched) throw new Error('TRIP_UPDATE_INVALID');
+                });
             }
 
             function reveal(data) {
@@ -135,7 +198,9 @@
                     try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (e2) {}
                     reveal(data);
                 } catch (e3) {
-                    err.textContent = '密码错误，请重试 · Incorrect password.';
+                    err.textContent = e3 && e3.message === 'TRIP_UPDATE_INVALID'
+                        ? '行程更新无法应用，请稍后重试 · A dashboard update could not be applied.'
+                        : '密码错误，请重试 · Incorrect password.';
                     btn.disabled = false;
                     btn.textContent = '解锁 Unlock';
                     pw.value = '';
@@ -147,12 +212,21 @@
                 try {
                     var responses = await Promise.all([
                         fetch('./payload.json', { cache: 'no-store' }),
-                        fetch('./sync.json', { cache: 'no-store' })
+                        fetch('./sync.json', { cache: 'no-store' }),
+                        fetch('./updates.json', { cache: 'no-store' })
                     ]);
-                    if (!responses[0].ok || !responses[1].ok) throw new Error('Trip data unavailable');
+                    if (!responses[0].ok || !responses[1].ok || !responses[2].ok) throw new Error('Trip data unavailable');
                     PAYLOAD = await responses[0].json();
                     SYNC_META = await responses[1].json();
-                    CACHE_KEY = 'tripData:' + PAYLOAD.iv;
+                    var updateManifest = await responses[2].json();
+                    var updateFiles = Array.isArray(updateManifest.updates) ? updateManifest.updates : [];
+                    UPDATE_PAYLOADS = await Promise.all(updateFiles.map(async function (filename) {
+                        if (!/^[A-Za-z0-9._-]+\.json$/.test(filename)) throw new Error('Invalid update filename');
+                        var response = await fetch('./updates/' + filename, { cache: 'no-store' });
+                        if (!response.ok) throw new Error('Trip update unavailable');
+                        return response.json();
+                    }));
+                    CACHE_KEY = 'tripData:' + PAYLOAD.iv + ':' + updateFiles.join(',');
 
                     try {
                         for (var i = sessionStorage.length - 1; i >= 0; i--) {

@@ -3,8 +3,11 @@
 import assert from 'node:assert/strict';
 import {
   createPublicKeyPayload,
+  decryptPublicKeyDocument,
   decryptPublicKeyPayload,
-  encryptPublicKeyPayload
+  encryptPublicKeyDocument,
+  encryptPublicKeyPayload,
+  unlockPayloadPrivateKey
 } from './lib/trip-crypto.mjs';
 
 const password = 'test-password-only';
@@ -23,4 +26,12 @@ assert.deepEqual(second.privateKey, first.privateKey);
 assert.notEqual(second.wrappedKey, first.wrappedKey);
 
 await assert.rejects(() => decryptPublicKeyPayload(second, 'wrong-password'));
+
+const update = {
+  schemaVersion: 1,
+  operations: [{ op: 'merge', locale: 'en', collection: 'itinerary', match: { segmentFlight: 'DL280' }, set: { status: 'Updated' } }]
+};
+const encryptedUpdate = await encryptPublicKeyDocument(update, second);
+const privateKey = await unlockPayloadPrivateKey(second, password);
+assert.deepEqual(await decryptPublicKeyDocument(encryptedUpdate, privateKey), update);
 console.log('Public-key trip encryption checks passed.');

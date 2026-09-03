@@ -19,6 +19,14 @@ node scripts/encrypt-trip.mjs /private/path/trip.json
 node scripts/verify-trip-payload.mjs
 ```
 
+For cloud updates, prefer a narrowly scoped encrypted overlay instead of rewriting the full payload. Create a private update document with `schemaVersion: 1` and `operations`. Supported operations are `merge` and `append`; each names `zh` or `en` plus a top-level array collection. A merge can match normal item fields, `titleContains`, or `segmentFlight`, and may include both item-level `set` fields and `segmentSet` fields. Encrypt it with:
+
+```bash
+node scripts/encrypt-trip-update.mjs /private/path/update.json trip/updates/<unique-name>.json
+```
+
+Add only the encrypted filename to `trip/updates.json`. The browser decrypts and applies overlays in manifest order after the user unlocks the base payload. A cloud task therefore needs only the public key and the new source message; it never decrypts the existing itinerary.
+
 Do not add plaintext trip JSON, raw emails, booking confirmations, tokens, passwords, or decrypted private keys to this repository. Use `scripts/migrate-trip-encryption.mjs` once, in an interactive local terminal, to convert a legacy version 1 payload. Its password prompt is hidden, and it does not write plaintext to disk.
 
 ## Email intake contract

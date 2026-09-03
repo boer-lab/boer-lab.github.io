@@ -70,6 +70,28 @@ async function encryptWithPublicKey(trip, publicKey, keyMaterial) {
   };
 }
 
+async function encryptDocumentWithPublicKey(document, publicKey) {
+  const dataKey = await crypto.subtle.generateKey(
+    { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']
+  );
+  const rawDataKey = await crypto.subtle.exportKey('raw', dataKey);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const data = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv }, dataKey, encoder.encode(JSON.stringify(document))
+  );
+  const wrappedKey = await crypto.subtle.encrypt(
+    { name: 'RSA-OAEP' }, publicKey, rawDataKey
+  );
+  return {
+    v: 2,
+    cipher: 'AES-GCM',
+    keyWrap: 'RSA-OAEP-SHA256',
+    wrappedKey: bytesToBase64(wrappedKey),
+    iv: bytesToBase64(iv),
+    data: bytesToBase64(data)
+  };
+}
+
 export async function createPublicKeyPayload(trip, password) {
   assertTrip(trip);
   const pair = await crypto.subtle.generateKey(
@@ -122,6 +144,20 @@ export async function encryptPublicKeyPayload(trip, existingPayload) {
   });
 }
 
+export async function encryptPublicKeyDocument(document, existingPayload) {
+  if (existingPayload.v !== 2 || existingPayload.keyWrap !== 'RSA-OAEP-SHA256') {
+    throw new Error('Dashboard must use version 2 encryption before creating updates.');
+  }
+  const publicKey = await crypto.subtle.importKey(
+    'spki',
+    base64ToBytes(existingPayload.publicKey),
+    { name: 'RSA-OAEP', hash: 'SHA-256' },
+    false,
+    ['encrypt']
+  );
+  return encryptDocumentWithPublicKey(document, publicKey);
+}
+
 export async function decryptPublicKeyPayload(payload, password) {
   if (payload.v !== 2) throw new Error('Expected a version 2 payload.');
   const passwordKey = await derivePasswordKey(
@@ -155,4 +191,36 @@ export async function decryptPublicKeyPayload(payload, password) {
   const trip = JSON.parse(decoder.decode(plaintext));
   assertTrip(trip);
   return trip;
+}
+
+export async function unlockPayloadPrivateKey(payload, password) {
+  if (payload.v !== 2) throw new Error('Expected a version 2 payload.');
+  const passwordKey = await derivePasswordKey(
+    password,
+    base64ToBytes(payload.privateKey.salt),
+    payload.privateKey.iter
+  );
+  const privateKeyBytes = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: base64ToBytes(payload.privateKey.iv) },
+    passwordKey,
+    base64ToBytes(payload.privateKey.data)
+  );
+  return crypto.subtle.importKey(
+    'pkcs8', privateKeyBytes, { name: 'RSA-OAEP', hash: 'SHA-256' }, false, ['decrypt']
+  );
+}
+
+export async function decryptPublicKeyDocument(envelope, privateKey) {
+  const rawDataKey = await crypto.subtle.decrypt(
+    { name: 'RSA-OAEP' }, privateKey, base64ToBytes(envelope.wrappedKey)
+  );
+  const dataKey = await crypto.subtle.importKey(
+    'raw', rawDataKey, { name: 'AES-GCM' }, false, ['decrypt']
+  );
+  const plaintext = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: base64ToBytes(envelope.iv) },
+    dataKey,
+    base64ToBytes(envelope.data)
+  );
+  return JSON.parse(decoder.decode(plaintext));
 }
