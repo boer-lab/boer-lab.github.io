@@ -18,3 +18,14 @@ node scripts/verify-trip-payload.mjs
 ```
 
 Do not add plaintext trip JSON, raw emails, booking confirmations, tokens, or passwords to this repository. The remaining email-intake step needs a selected mail provider and explicit account authorization before it can be connected.
+
+## Email intake contract
+
+`scripts/extract-travel-update.mjs` accepts a private JSON file with `from`, `subject`, `text`, and an optional `receivedAt`. It emits a normalized candidate containing sender trust, likely change type, flight numbers, confirmation identifiers, dates, and times. Every candidate is marked `reviewRequired`; extraction alone can never publish a dashboard change.
+
+```sh
+node scripts/extract-travel-update.mjs /private/path/email.json
+node scripts/test-travel-update.mjs
+```
+
+The trusted-domain list is deliberately narrow. Add a provider only after verifying the legitimate sender domain from a known booking message.
