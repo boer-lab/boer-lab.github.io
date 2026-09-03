@@ -38,8 +38,6 @@ const trustedSender = trustedDomains.has(domain);
 const combined = `${subject}\n${text}`;
 const flightMatches = [...combined.matchAll(/\b([A-Z]{2})\s?(\d{1,4})\b/g)]
   .map((match) => `${match[1]}${match[2]}`);
-const confirmationMatches = [...combined.matchAll(/\b(?:confirmation|conf(?:irmation)?\.? code|record locator|reservation)\s*[:#-]?\s*([A-Z0-9]{5,12})\b/gi)]
-  .map((match) => match[1].toUpperCase());
 const dateMatches = [...combined.matchAll(/\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:,\s+\d{4})?\b/gi)]
   .map((match) => match[0]);
 const timeMatches = [...combined.matchAll(/\b\d{1,2}:\d{2}\s?(?:AM|PM)\b/gi)]
@@ -63,8 +61,7 @@ const candidate = {
   kind,
   changeLikely: changeWords.test(combined),
   identifiers: {
-    flights: [...new Set(flightMatches)],
-    confirmations: [...new Set(confirmationMatches)]
+    flights: [...new Set(flightMatches)]
   },
   observed: {
     dates: [...new Set(dateMatches)],

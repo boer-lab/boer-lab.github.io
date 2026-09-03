@@ -23,7 +23,8 @@ try {
   assert.equal(trusted.kind, 'flight');
   assert.equal(trusted.changeLikely, true);
   assert.deepEqual(trusted.identifiers.flights, ['DL3923']);
-  assert.deepEqual(trusted.identifiers.confirmations, ['ABC123']);
+  assert.equal('confirmations' in trusted.identifiers, false);
+  assert.equal(JSON.stringify(trusted).includes('ABC123'), false);
 
   const untrustedPath = join(dir, 'untrusted.json');
   await writeFile(untrustedPath, JSON.stringify({
@@ -34,6 +35,7 @@ try {
   const untrusted = JSON.parse((await run(process.execPath, ['scripts/extract-travel-update.mjs', untrustedPath])).stdout);
   assert.equal(untrusted.source.trusted, false);
   assert.equal(untrusted.reviewRequired, true);
+  assert.equal(JSON.stringify(untrusted).includes('ZXCVBN'), false);
 
   console.log('Travel-email extraction checks passed.');
 } finally {

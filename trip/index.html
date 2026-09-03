@@ -70,15 +70,39 @@
                 return u;
             }
 
-            async function decryptTrip(password) {
+            async function derivePasswordKey(password, salt, iterations) {
                 var enc = new TextEncoder();
                 var baseKey = await crypto.subtle.importKey(
                     'raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
-                var key = await crypto.subtle.deriveKey(
-                    { name: 'PBKDF2', salt: b64ToBytes(PAYLOAD.salt), iterations: PAYLOAD.iter, hash: 'SHA-256' },
+                return crypto.subtle.deriveKey(
+                    { name: 'PBKDF2', salt: salt, iterations: iterations, hash: 'SHA-256' },
                     baseKey, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
-                var plainBuf = await crypto.subtle.decrypt(
-                    { name: 'AES-GCM', iv: b64ToBytes(PAYLOAD.iv) }, key, b64ToBytes(PAYLOAD.data));
+            }
+
+            async function decryptTrip(password) {
+                var plainBuf;
+                if (PAYLOAD.v === 1) {
+                    var legacyKey = await derivePasswordKey(password, b64ToBytes(PAYLOAD.salt), PAYLOAD.iter);
+                    plainBuf = await crypto.subtle.decrypt(
+                        { name: 'AES-GCM', iv: b64ToBytes(PAYLOAD.iv) }, legacyKey, b64ToBytes(PAYLOAD.data));
+                } else if (PAYLOAD.v === 2) {
+                    var protectedKey = PAYLOAD.privateKey;
+                    var passwordKey = await derivePasswordKey(
+                        password, b64ToBytes(protectedKey.salt), protectedKey.iter);
+                    var privateKeyBytes = await crypto.subtle.decrypt(
+                        { name: 'AES-GCM', iv: b64ToBytes(protectedKey.iv) },
+                        passwordKey, b64ToBytes(protectedKey.data));
+                    var privateKey = await crypto.subtle.importKey(
+                        'pkcs8', privateKeyBytes, { name: 'RSA-OAEP', hash: 'SHA-256' }, false, ['decrypt']);
+                    var rawDataKey = await crypto.subtle.decrypt(
+                        { name: 'RSA-OAEP' }, privateKey, b64ToBytes(PAYLOAD.wrappedKey));
+                    var dataKey = await crypto.subtle.importKey(
+                        'raw', rawDataKey, { name: 'AES-GCM' }, false, ['decrypt']);
+                    plainBuf = await crypto.subtle.decrypt(
+                        { name: 'AES-GCM', iv: b64ToBytes(PAYLOAD.iv) }, dataKey, b64ToBytes(PAYLOAD.data));
+                } else {
+                    throw new Error('Unsupported encrypted payload');
+                }
                 return JSON.parse(new TextDecoder().decode(plainBuf));
             }
 
