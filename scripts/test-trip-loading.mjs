@@ -5,6 +5,16 @@ import vm from 'node:vm';
 // Run the actual page initialization, including manifest validation and fetching.
 const html = await readFile(new URL('../trip/index.html', import.meta.url), 'utf8');
 const script = html.match(/<script>\s*([\s\S]*?)<\/script>/)[1];
+const applyContext = {};
+vm.runInNewContext(script.slice(script.indexOf('function itemMatches'), script.indexOf('function reveal')), applyContext);
+const sample = { en: { yellowstone: { sections: [] } }, zh: { yellowstone: { sections: [] } } };
+for (const locale of ['en', 'zh']) {
+  applyContext.applyUpdate(sample, { schemaVersion: 1, operations: [{
+    op: 'append', locale, collection: 'yellowstone.sections',
+    value: { type: 'list', heading: 'Meals', items: ['Lunch'] }
+  }] });
+  assert.equal(sample[locale].yellowstone.sections[0].heading, 'Meals');
+}
 async function load(invalidManifest = false) {
   const elements = new Map();
   const requests = [];

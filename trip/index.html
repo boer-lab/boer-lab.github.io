@@ -142,7 +142,9 @@
                 }
                 update.operations.forEach(function (operation) {
                     var locale = trip[operation.locale];
-                    var collection = locale && locale[operation.collection];
+                    var collection = operation.collection === 'yellowstone.sections'
+                        ? locale && locale.yellowstone && locale.yellowstone.sections
+                        : locale && locale[operation.collection];
                     if (!Array.isArray(collection)) throw new Error('TRIP_UPDATE_INVALID');
                     if (operation.op === 'append' && operation.value) {
                         collection.push(operation.value);
