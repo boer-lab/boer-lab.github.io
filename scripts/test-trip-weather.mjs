@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import '../trip/weather.js';
+const {summarize,dateAt}=globalThis.TripWeather;
+const now=Date.parse('2026-09-15T12:00:00Z');
+const sample=(extra={})=>({properties:{updateTime:'2026-09-15T11:00:00Z',periods:[{startTime:'2026-09-15T09:00:00-06:00',temperature:40,temperatureUnit:'F',windSpeed:'5 to 10 mph',probabilityOfPrecipitation:{value:10},shortForecast:'Sunny',...extra}]}});
+assert.equal(dateAt('2026-09-16T01:00:00Z'),'2026-09-15');
+let result=summarize(sample(),'2026-09-15',8,18,now);
+assert.equal(result.available,true);assert.equal(result.stale,false);assert.equal(result.wind,10);assert.equal(result.caution,false);
+assert.equal(summarize(sample(),'2026-09-16',8,18,now).available,false);
+assert.equal(summarize(sample({temperature:null,temperatureUnit:'C'}),'2026-09-15',8,18,now).available,false);
+assert.equal(summarize(sample({shortForecast:'Chance of Snow'}),'2026-09-15',8,18,now).caution,true);
+assert.equal(summarize(sample({windSpeed:'15 to 30 mph'}),'2026-09-15',8,18,now).caution,true);
+assert.equal(summarize(sample({probabilityOfPrecipitation:{value:60}}),'2026-09-15',8,18,now).wet,true);
+assert.equal(summarize(sample(),'2026-09-15',8,18,now+24*3600000).stale,true);
+assert.equal(summarize(sample({probabilityOfPrecipitation:{value:null}}),'2026-09-15',8,18,now).rain,null);
+assert.equal(summarize(sample(),'2026-09-15',21,23,now).available,false);
+console.log('Weather date, missing data, stale data, precipitation and hazardous forecast checks pass.');

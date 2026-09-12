@@ -9,6 +9,7 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone@7.23.9/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./weather.js"></script>
 
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; }
@@ -18,6 +19,52 @@
         @media (max-width: 640px) {
             .timeline-container { margin-left: 1rem; padding-left: 1.25rem; }
             .timeline-dot { left: -1.25rem; }
+        }
+
+        .research-guide { line-height:1.7; overflow-wrap:anywhere; }
+        .research-guide h3 {font-size:1.3rem;font-weight:700;line-height:1.35;}
+        .research-guide a:focus-visible,.research-guide button:focus-visible {outline:3px solid #0284c7;outline-offset:3px;}
+        .daily-guide {max-width:900px;margin:auto;}
+        .day-selector {display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:16px 0;}
+        .day-selector button {min-height:48px;border:1px solid #cbd5e1;border-radius:10px;background:white;padding:8px 4px;font-size:14px;font-weight:600;}
+        .day-selector button[aria-pressed=true] {background:#164e63;color:white;border-color:#164e63;}
+        .day-plan {background:white;border:1px solid #dbe3e9;border-radius:16px;overflow:hidden;}
+        .day-plan figure {margin:0;}
+        .day-plan img {width:100%;height:260px;object-fit:cover;}
+        .day-plan figcaption {font-size:13px;line-height:1.5;padding:10px 18px;color:#475569;border-bottom:1px solid #e2e8f0;}
+        .day-plan figcaption a {text-decoration:underline;}
+        .day-body {padding:24px;}
+        .day-body p {margin:8px 0 14px;}
+        .guide-eyebrow {font-size:14px;color:#475569;font-weight:600;letter-spacing:.04em;}
+        .day-facts {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0;}
+        .day-facts div {border-top:2px solid #dbeafe;padding-top:8px;}
+        .day-facts dt {font-size:14px;color:#475569;}.day-facts dd{font-weight:600;margin-top:4px;}
+        .day-stops {list-style:none;padding:0;margin:24px 0;}.day-stops li{display:flex;gap:14px;margin:0 0 18px;}
+        .stop-number {display:flex;align-items:center;justify-content:center;background:#e0f2fe;color:#164e63;border-radius:50%;width:30px;height:30px;flex-shrink:0;font-size:14px;font-weight:700;}
+        .day-rest {border-left:3px solid #0369a1;padding:10px 16px;background:#f0f9ff;}.day-rest p{margin-bottom:0;}
+        .guide-meta {font-size:14px;line-height:1.55;color:#475569;}
+        .route-links {display:grid;gap:8px;margin:12px 0;}.route-links a{display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:48px;padding:12px 16px;border:1px solid #cbd5e1;border-radius:10px;color:#075985;font-weight:600;}
+        .day-detail {border-top:1px solid #cbd5e1;margin-top:16px;}.day-detail summary{padding:16px 0;cursor:pointer;font-weight:600;}.day-detail a{color:#075985;text-decoration:underline;}
+        .morning-check {margin-top:20px;padding:24px;border:1px solid #bae6fd;border-radius:16px;background:#f0f9ff;}.morning-check>p{margin:8px 0 16px;}
+        .weather-controls {display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin:16px 0;}.weather-controls label{display:grid;gap:6px;font-size:14px;flex:1;min-width:160px;}.weather-controls input{min-width:0;width:100%;background:white;border:1px solid #94a3b8;border-radius:8px;min-height:48px;padding:10px;font-size:16px;}
+        .guide-primary{background:#164e63;color:white;border-radius:8px;min-height:48px;padding:12px 18px;font-weight:600;}.guide-primary:disabled{opacity:.6;}
+        .weather-verdict{background:#ecfdf5;border:1px solid #6ee7b7;padding:16px;border-radius:10px;}.weather-verdict.weather-caution{background:#fffbeb;border-color:#fcd34d;}
+        .forecast-place{margin:16px 0;border-top:1px solid #bae6fd;padding-top:16px;}.forecast-place p{margin:6px 0;}.forecast-place a,.guide-links a{color:#075985;text-decoration:underline;}.forecast-place details{white-space:pre-line;}
+        .guide-links{display:flex;gap:8px 20px;flex-wrap:wrap;margin:16px 0;}.guide-links a{min-height:44px;display:flex;align-items:center;}
+        .guide-contents a {padding:10px 0;min-height:44px;}
+        .chapter-photo{margin:16px 0;}.chapter-photo img{width:100%;max-height:320px;object-fit:cover;border-radius:12px;}.chapter-photo figcaption{font-size:14px;color:#475569;margin-top:6px;}
+        @media(max-width:640px){
+            .research-guide {font-size:16px;line-height:1.75;}
+            .day-body,.morning-check {padding:18px;}.day-plan img{height:210px;}
+            .day-facts{grid-template-columns:1fr;gap:10px;}.day-facts div{display:grid;grid-template-columns:90px 1fr;gap:12px;}.day-facts dd{margin:0;}
+            .weather-controls{display:grid;grid-template-columns:minmax(0,1fr);}.weather-controls label{min-width:0;}
+            .guide-table table,.guide-table tbody,.guide-table tr,.guide-table td{display:block;width:100%;min-width:0;}
+            .guide-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+            .guide-table tr{margin-bottom:14px;border:1px solid #cbd5e1;border-radius:12px;background:white;overflow:hidden;}
+            .guide-table td{padding:10px 14px;font-size:16px;}.guide-table td:first-child{background:#e0f2fe;color:#164e63;font-weight:700;}
+            .guide-table td::before{content:attr(data-label);display:block;font-size:14px;font-weight:600;color:#475569;margin-bottom:3px;}
+            .guide-table td:first-child::before{font-weight:400;}
+            .guide-contents{display:grid;grid-template-columns:1fr;gap:0;}.guide-contents a{border-bottom:1px solid #e2e8f0;text-decoration:none;}
         }
 
         /* Password gate */
@@ -435,27 +482,95 @@
             );
         };
 
+        const WeatherCheck = ({ day, zh }) => {
+            const pick=(en,cn)=>zh?cn:en;
+            const [date,setDate]=React.useState(day.date);
+            const [result,setResult]=React.useState(null);
+            const [busy,setBusy]=React.useState(false);
+            const token=React.useRef(0);
+            React.useEffect(()=>{token.current++;setDate(day.date);setResult(null);setBusy(false);},[day.date]);
+            const check=async()=>{
+                const request=++token.current;setBusy(true);setResult(null);
+                const results=await Promise.allSettled(day.weatherPoints.map(p=>TripWeather.loadPoint(p,date)));
+                if(request!==token.current)return;
+                setResult({results,checked:new Date().toISOString()});setBusy(false);
+            };
+            const values=result?.results.filter(r=>r.status==='fulfilled').map(r=>r.value)||[];
+            const incomplete=values.length!==day.weatherPoints.length || values.some(v=>!v.summary.available||v.summary.stale||v.summary.rain===null||v.summary.wind===null||v.alerts===null);
+            const caution=values.some(v=>v.summary.caution||v.alerts?.some(a=>['Extreme','Severe','Moderate'].includes(a.severity)));
+            const wet=values.some(v=>v.summary.wet);
+            const temp=v=>v===null?'—':`${Math.round(v)}°F / ${Math.round((v-32)*5/9)}°C`;
+            const time=v=>new Date(v).toLocaleString(zh?'zh-CN':'en-US',{timeZone:'America/Denver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+            return <section className="morning-check" aria-label={pick('Morning weather check','早晨天气检查')}>
+                <h3>{pick('Before you set off','出发前看一眼')}</h3>
+                <p>{pick('Check the forecast for this route, then check road access. All times are Yellowstone time (MDT).','先查这条路线的预报，再确认道路通行。时间均为黄石当地 MDT。')}</p>
+                <div className="weather-controls"><label>{pick('Forecast date','预报日期')}<input type="date" value={date} onChange={e=>{token.current++;setDate(e.target.value);setResult(null);setBusy(false);}} /></label>
+                <button className="guide-primary" disabled={busy||!date} onClick={check}>{busy?pick('Checking…','正在检查…'):pick('Check weather now','立即查天气')}</button></div>
+                <div aria-live="polite">{result && <>
+                    <div className={'weather-verdict '+(incomplete||caution?'weather-caution':'')}><strong>{incomplete?pick('Check incomplete — confirm manually','检查不完整，请手动确认'):caution?pick('Reconsider outdoor stops','重新评估户外安排'):wet?pick('Keep the day flexible','今天灵活安排'):pick('Forecast supports this route','预报支持这条路线')}</strong>
+                    <p>{incomplete?pick('Missing or older forecast data cannot confirm the plan. Open the official forecasts below.','缺失或较旧的预报不能确认行程，请打开下方官方预报。'):caution?day.caution:wet?day.wet:day.fair}</p></div>
+                    <p className="guide-meta">{pick('Checked','查询时间')} {time(result.checked)} MDT · {pick('Forecast guidance, not a road or trail clearance.','这是预报建议，并不代表道路或步道已确认开放。')}</p>
+                    {result.results.map((r,i)=>{const point=day.weatherPoints[i], v=r.status==='fulfilled'?r.value:null;return <div className="forecast-place" key={point.name}>
+                        <strong>{point.name}</strong>{v&&v.summary.available?<>
+                            <p>{temp(v.summary.low)} → {temp(v.summary.high)} · {pick('8 am–6 pm available hours','8–18点可用时段')}</p>
+                            <p>{v.summary.conditions.join(' / ')}</p><p>{pick('Max rain chance','最高降水概率')} {v.summary.rain===null?pick('unavailable','暂无'):v.summary.rain+'%'} · {pick('Wind up to','风速最高')} {v.summary.wind===null?'—':v.summary.wind+' mph'}</p>
+                            <p className="guide-meta">{pick('NWS issued','NWS发布')} {v.summary.issued?time(v.summary.issued):pick('unknown','未知')} MDT {v.summary.stale?pick('· older than 12 hours / unavailable time','· 超过12小时／时间缺失'):''}</p>
+                            {day.stars && v.night.available && <p>{pick('9–11 pm stars','21–23点观星')}：{temp(v.night.low)} · {v.night.conditions.join(' / ')}. {pick('Moon, smoke and the southern horizon still matter; use the star guide.','仍需考虑月光、烟霾及南方地平线，请查看银河指南。')}</p>}
+                        </>:<p>{pick('Forecast for this date is unavailable. Try again or use the official link.','此日期暂无预报，请重试或打开官方链接。')}</p>}
+                        {v?.alerts===null?<p>{pick('Weather alerts could not be checked.','天气警报未能读取。')}</p>:v?.alerts?.map((a,j)=><details key={j}><summary>{a.event}</summary><p>{a.headline}</p><p>{a.instruction||a.description}</p></details>)}
+                        <a href={`https://forecast.weather.gov/MapClick.php?lat=${point.lat}&lon=${point.lon}`} target="_blank" rel="noopener noreferrer">{pick('Official forecast & alerts ↗','官方预报与警报 ↗')}</a>
+                    </div>;})}
+                </>}</div>
+                <div className="guide-links"><a href="https://www.nps.gov/yell/planyourvisit/parkroads.htm" target="_blank" rel="noopener noreferrer">{pick('Park roads ↗','公园道路 ↗')}</a><a href="https://www.511mt.net/" target="_blank" rel="noopener noreferrer">{pick('Montana roads ↗','蒙大拿道路 ↗')}</a><a href="https://fire.airnow.gov/" target="_blank" rel="noopener noreferrer">{pick('Smoke map ↗','烟霾地图 ↗')}</a></div>
+                <p className="guide-meta">{pick('The check suggests changes; it does not automatically rewrite your itinerary. If changing days, choose a route above and set the forecast date to the day you will actually go.','此检查提供调整建议，不会自动改写行程。调换游览日时，请在上方选路线，并把预报日期改为实际出行日。')}</p>
+            </section>;
+        };
+        const DailyGuide = ({ report }) => {
+            const zh=report.dailyGuide.locale==='zh', pick=(en,cn)=>zh?cn:en, days=report.dailyGuide.days;
+            const [selected,setSelected]=React.useState(()=>Math.max(0,days.findIndex(d=>d.date===TripWeather.dateAt(Date.now()))));
+            const day=days[selected];
+            return <section className="daily-guide">
+                <h2 className="text-xl font-bold">{pick('Your day, at a glance','今天怎么玩')}</h2>
+                <div className="day-selector" role="group" aria-label={pick('Choose a day','选择日期')}>{days.map((d,i)=><button key={d.date} aria-pressed={selected===i} onClick={()=>setSelected(i)}>{d.shortLabel}</button>)}</div>
+                <WeatherCheck key={day.date} day={day} zh={zh} />
+                <article className="day-plan mt-5">
+                    {day.photo && <figure><img src={day.photo.url} alt={day.photo.alt} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.hidden=true;}} /><figcaption>{day.photo.caption} · <a href={day.photo.sourceUrl} target="_blank" rel="noopener noreferrer">{day.photo.credit}</a> · {pick('Reference photo, not current conditions','参考照片，非实时景象')}</figcaption></figure>}
+                    <div className="day-body"><p className="guide-eyebrow">{day.date} · MDT</p><h3>{day.title}</h3><p>{day.intro}</p>
+                        <dl className="day-facts">{day.facts.map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+                        <ol className="day-stops">{day.stops.map((stop,i)=><li key={i}><span className="stop-number">{i+1}</span><div><strong>{stop.title}</strong><p>{stop.text}</p></div></li>)}</ol>
+                        <div className="day-rest"><strong>{pick('Keep it comfortable','轻松原则')}</strong><p>{day.comfort}</p></div>
+                        <h4 className="font-semibold mt-5">{pick('Directions, one leg at a time','分段导航')}</h4><p className="guide-meta">{pick('Open the next leg in Google Maps. Check signs and road closures; map estimates exclude sightseeing and wildlife delays.','在 Google 地图打开下一段。以路标和道路封闭信息为准；地图时间不含游览与动物堵车。')}</p>
+                        <div className="route-links">{day.routes.map((route,i)=><a key={i} href={route.url} target="_blank" rel="noopener noreferrer"><span>{i+1}. {route.label}</span><span aria-hidden="true">↗</span></a>)}</div>
+                        <p className="guide-meta">{day.routeNote}</p>
+                        {day.details.map(detail=>{const chapter=report.chapters.find(c=>c.id===detail.id);return chapter?<details className="day-detail" key={detail.id}><summary>{detail.label}</summary>{!detail.blocks&&chapter.paragraphs?.map((p,i)=><p key={i}>{p.text}</p>)}{chapter.blocks?.filter((b,i)=>!detail.blocks||detail.blocks.includes(i)).map((b,i)=><div key={i}><h4 className="font-semibold mt-4">{b.heading}</h4>{b.paragraphs?.map((p,j)=><p key={j}>{p.text}</p>)}</div>)}<a href={`#guide-${detail.id}`}>{pick('Full detail & sources ↓','完整说明与来源 ↓')}</a></details>:null;})}
+                    </div>
+                </article>
+            </section>;
+        };
+
         /* ---------- Private research guide ---------- */
         const ResearchGuide = ({ report }) => {
             const cite = (ids = []) => ids.map(id => {
                 const source = report.sources.find(s => s.id === id);
                 return source ? <a key={id} href={source.url || `#source-${id}`} target={source.url ? '_blank' : undefined} rel="noopener noreferrer" className="text-sky-800 underline ml-1">[{id}]</a> : null;
             });
-            return <article className="space-y-6 text-gray-800">
+            return <article className="research-guide space-y-6 text-gray-800">
+                {report.dailyGuide && <DailyGuide report={report} />}
                 <header className="border-b pb-5">
                     <h2 className="text-2xl font-bold">{report.heading}</h2>
                     <p className="mt-3 leading-relaxed">{report.summary}</p>
                     <p className="mt-3 text-sm text-gray-600">{report.status}</p>
                 </header>
-                <nav aria-label={report.navigationLabel} className="flex flex-wrap gap-x-4 gap-y-2 text-sm border-b pb-4">
+                <nav aria-label={report.navigationLabel} className="guide-contents flex flex-wrap gap-x-4 gap-y-2 text-sm border-b pb-4">
                     {report.chapters.map(c => <a key={c.id} href={`#guide-${c.id}`} className="underline text-sky-800">{c.heading}</a>)}
                 </nav>
                 {report.chapters.map(c => <section id={`guide-${c.id}`} key={c.id} className="scroll-mt-4 border-b pb-6">
                     <h3 className="text-xl font-semibold mb-3">{c.heading}</h3>
+                    {c.photo && <figure className="chapter-photo"><img src={c.photo.url} alt={c.photo.alt} loading="lazy" referrerPolicy="no-referrer" /><figcaption>{c.photo.caption} · <a href={c.photo.sourceUrl} target="_blank" rel="noopener noreferrer">{c.photo.credit}</a></figcaption></figure>}
                     {(c.paragraphs || []).map((p, i) => <p key={i} className="leading-relaxed mb-3">{p.text}{cite(p.refs)}</p>)}
-                    {c.table && <div className="overflow-x-auto mb-4"><table className="w-full text-left text-sm border-collapse min-w-[560px]">
+                    {c.table && <div className="guide-table mb-4"><table className="w-full text-left border-collapse">
                         <thead className="bg-gray-100"><tr>{c.table.cols.map((v,i) => <th scope="col" key={i} className="p-3 border-b">{v}</th>)}</tr></thead>
-                        <tbody>{c.table.rows.map((row,i) => <tr key={i} className="border-b even:bg-gray-50">{row.map((v,j) => <td key={j} className="p-3 align-top leading-relaxed">{v}</td>)}</tr>)}</tbody>
+                        <tbody>{c.table.rows.map((row,i) => <tr key={i} className="border-b even:bg-gray-50">{row.map((v,j) => <td key={j} data-label={c.table.cols[j]} className="p-3 align-top leading-relaxed">{v}</td>)}</tr>)}</tbody>
                     </table><p className="text-sm mt-2">{c.table.note}{cite(c.table.refs)}</p></div>}
                     {(c.blocks || []).map((b,i) => <div key={i} className="mt-4">
                         <h4 className="font-semibold mb-2">{b.heading}</h4>
