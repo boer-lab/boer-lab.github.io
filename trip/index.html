@@ -435,8 +435,49 @@
             );
         };
 
+        /* ---------- Private research guide ---------- */
+        const ResearchGuide = ({ report }) => {
+            const cite = (ids = []) => ids.map(id => {
+                const source = report.sources.find(s => s.id === id);
+                return source ? <a key={id} href={source.url || `#source-${id}`} target={source.url ? '_blank' : undefined} rel="noopener noreferrer" className="text-sky-800 underline ml-1">[{id}]</a> : null;
+            });
+            return <article className="space-y-6 text-gray-800">
+                <header className="border-b pb-5">
+                    <h2 className="text-2xl font-bold">{report.heading}</h2>
+                    <p className="mt-3 leading-relaxed">{report.summary}</p>
+                    <p className="mt-3 text-sm text-gray-600">{report.status}</p>
+                </header>
+                <nav aria-label={report.navigationLabel} className="flex flex-wrap gap-x-4 gap-y-2 text-sm border-b pb-4">
+                    {report.chapters.map(c => <a key={c.id} href={`#guide-${c.id}`} className="underline text-sky-800">{c.heading}</a>)}
+                </nav>
+                {report.chapters.map(c => <section id={`guide-${c.id}`} key={c.id} className="scroll-mt-4 border-b pb-6">
+                    <h3 className="text-xl font-semibold mb-3">{c.heading}</h3>
+                    {(c.paragraphs || []).map((p, i) => <p key={i} className="leading-relaxed mb-3">{p.text}{cite(p.refs)}</p>)}
+                    {c.table && <div className="overflow-x-auto mb-4"><table className="w-full text-left text-sm border-collapse min-w-[560px]">
+                        <thead className="bg-gray-100"><tr>{c.table.cols.map((v,i) => <th scope="col" key={i} className="p-3 border-b">{v}</th>)}</tr></thead>
+                        <tbody>{c.table.rows.map((row,i) => <tr key={i} className="border-b even:bg-gray-50">{row.map((v,j) => <td key={j} className="p-3 align-top leading-relaxed">{v}</td>)}</tr>)}</tbody>
+                    </table><p className="text-sm mt-2">{c.table.note}{cite(c.table.refs)}</p></div>}
+                    {(c.blocks || []).map((b,i) => <div key={i} className="mt-4">
+                        <h4 className="font-semibold mb-2">{b.heading}</h4>
+                        {(b.paragraphs || []).map((p,j) => <p key={j} className="leading-relaxed mb-3">{p.text}{cite(p.refs)}</p>)}
+                        {b.items && <ul className="list-disc pl-5 space-y-2">{b.items.map((p,j) => <li key={j} className="leading-relaxed">{p.text}{cite(p.refs)}</li>)}</ul>}
+                    </div>)}
+                </section>)}
+                <section id="guide-sources"><h3 className="text-xl font-semibold mb-3">{report.sourcesLabel}</h3>
+                    <ol className="space-y-3 text-sm">{report.sources.map(s => <li id={`source-${s.id}`} key={s.id} className="break-words">[{s.id}] {s.publisher}. {s.url ? <a href={s.url} target="_blank" rel="noopener noreferrer" className="underline text-sky-800">{s.title}</a> : s.title}. {s.date}</li>)}</ol>
+                </section>
+            </article>;
+        };
+        const Yellowstone = ({ y }) => {
+            const report = y.sections.filter(s => s.type === 'research').slice(-1)[0];
+            if (!report) return <LegacyYellowstone y={y} />;
+            return <div className="space-y-8"><ResearchGuide report={report} />
+                <details className="border-t pt-4 text-gray-600"><summary className="cursor-pointer">{report.archiveLabel}</summary>
+                    <div className="mt-4"><LegacyYellowstone y={{ ...y, sections: y.sections.filter(s => s.type !== 'research') }} /></div>
+                </details></div>;
+        };
         /* ---------- Yellowstone page ---------- */
-        const Yellowstone = ({ y }) => (
+        const LegacyYellowstone = ({ y }) => (
             <div className="space-y-6">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900">{y.title}</h2>
@@ -575,6 +616,7 @@
 
             const formattedTotal = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalUSD);
 
+            const latestGuide = t.yellowstone.sections.filter(s => s.type === 'research').slice(-1)[0];
             const TABS = [
                 ['timeline', t.tabs.timeline],
                 ['budget', t.tabs.budget],
@@ -602,6 +644,10 @@
                         )}
                     </div>
 
+                    {latestGuide && <div className="border border-sky-200 bg-sky-50 p-4 mb-5">
+                        <p className="text-sm leading-relaxed">{latestGuide.banner}</p>
+                        <button onClick={() => setTab('yellowstone')} className="mt-2 font-semibold underline text-sky-900">{latestGuide.openLabel}</button>
+                    </div>}
                     <AlertBanner alerts={t.alerts} header={t.alertsHeader} openWord={t.urgentLabel} settledWord={t.settledWord} />
 
                     <div className="flex flex-wrap gap-2 mb-6">
