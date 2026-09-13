@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trip Dashboard</title>
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="./manifest.webmanifest">
 
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone@7.23.9/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./vendor/react-18.3.1.production.min.js"></script>
+    <script src="./vendor/react-dom-18.3.1.production.min.js"></script>
+    <script src="./vendor/babel-7.23.9.min.js"></script>
+    <script src="./vendor/tailwindcss-3.4.17.js"></script>
+    <script src="./offline.js"></script>
     <script src="./weather.js"></script>
 
     <style>
@@ -65,6 +68,29 @@
             .guide-table td::before{content:attr(data-label);display:block;font-size:14px;font-weight:600;color:#475569;margin-bottom:3px;}
             .guide-table td:first-child::before{font-weight:400;}
             .guide-contents{display:grid;grid-template-columns:1fr;gap:0;}.guide-contents a{border-bottom:1px solid #e2e8f0;text-decoration:none;}
+        }
+
+        * {box-sizing:border-box;}
+        .stop-card {width:100%;min-width:0;border:1px solid #cbd5e1;border-radius:12px;background:#fff;padding:16px;overflow-wrap:anywhere;}
+        .stop-card h4 {font-weight:700;font-size:1.1rem;line-height:1.5;}
+        .stop-card .stop-number {display:inline-flex;vertical-align:middle;margin-right:6px;}
+        .day-stops li {display:block;margin:0;min-width:0;}
+        .stop-metrics,.wildlife-level {font-size:.9rem;}
+        .stop-facilities {display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;font-size:.9rem;}
+        .stop-facilities dt {font-weight:600;color:#475569;}.stop-facilities dd {margin:0;}
+        .reset-point {border:2px solid #0284c7;background:#f0f9ff;}
+        .day-badge {display:inline-block;font-weight:700;background:#e0f2fe;color:#164e63;padding:4px 10px;border-radius:6px;}
+        .wildlife-yellow,.turnaround {background:#fffbeb;border-left:3px solid #d97706;padding:10px;}
+        .wildlife-orange {background:#fff7ed;border-left:3px solid #ea580c;padding:10px;}
+        .next-leg {padding:12px 16px;color:#475569;font-size:.9rem;}
+        .next-reset {border-top:1px solid #cbd5e1;padding-top:10px;font-size:.9rem;}
+        @media(max-width:640px){
+            #root {overflow-wrap:anywhere;}.day-selector {grid-template-columns:repeat(3,minmax(0,1fr));}
+            .day-body {padding:14px;}.stop-facilities {grid-template-columns:1fr;}.stop-facilities>div {display:grid;grid-template-columns:80px minmax(0,1fr);gap:8px;}
+            .day-stops {margin:16px 0;}.route-links a {min-width:0;}.day-detail {min-width:0;}
+            #root .overflow-x-auto {overflow:visible;}#root table,#root tbody,#root tr,#root td {display:block;width:100%;min-width:0;}
+            #root thead {position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+            #root td {white-space:normal;text-align:left;}#root tr {border:1px solid #e2e8f0;border-radius:8px;margin-bottom:12px;}
         }
 
         /* Password gate */
@@ -234,8 +260,6 @@
             var btn = document.getElementById('gate-btn');
             var err = document.getElementById('gate-err');
 
-            var CACHE_KEY = null;
-
             form.addEventListener('submit', async function (e) {
                 e.preventDefault();
                 if (!PAYLOAD) return;
@@ -244,7 +268,7 @@
                 btn.textContent = '解锁中… Unlocking';
                 try {
                     var data = await decryptTrip(pw.value);
-                    try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (e2) {}
+                    pw.value = ''; // Keep decrypted trip data in memory only.
                     reveal(data);
                 } catch (e3) {
                     err.textContent = e3 && e3.message === 'TRIP_UPDATE_INVALID'
@@ -257,12 +281,21 @@
                 }
             });
 
+            // Purge legacy plaintext session copies even if the next load fails.
+            try {
+                for (var i = sessionStorage.length - 1; i >= 0; i--) {
+                    var k = sessionStorage.key(i);
+                    if (k && k.indexOf('tripData:') === 0) sessionStorage.removeItem(k);
+                }
+            } catch (e) {}
+
             async function initialize() {
+                var fetchTripData = typeof window !== 'undefined' && window.TripOffline ? window.TripOffline.beginDataSession() : fetch;
                 try {
                     var responses = await Promise.all([
-                        fetch('./payload.json', { cache: 'no-store' }),
-                        fetch('./sync.json', { cache: 'no-store' }),
-                        fetch('./updates.json', { cache: 'no-store' })
+                        fetchTripData('./payload.json', { cache: 'no-store' }),
+                        fetchTripData('./sync.json', { cache: 'no-store' }),
+                        fetchTripData('./updates.json', { cache: 'no-store' })
                     ]);
                     if (!responses[0].ok || !responses[1].ok || !responses[2].ok) throw new Error('Trip data unavailable');
                     PAYLOAD = await responses[0].json();
@@ -271,20 +304,11 @@
                     var updateFiles = Array.isArray(updateManifest.updates) ? updateManifest.updates : [];
                     UPDATE_PAYLOADS = await Promise.all(updateFiles.map(async function (filename) {
                         if (!/^[A-Za-z0-9._-]+\.json$/.test(filename)) throw new Error('Invalid update filename');
-                        var response = await fetch('./updates/' + filename, { cache: 'no-store' });
+                        var response = await fetchTripData('./updates/' + filename, { cache: 'no-store' });
                         if (!response.ok) throw new Error('Trip update unavailable');
                         return response.json();
                     }));
-                    CACHE_KEY = 'tripData:' + PAYLOAD.iv + ':' + updateFiles.join(',');
 
-                    try {
-                        for (var i = sessionStorage.length - 1; i >= 0; i--) {
-                            var k = sessionStorage.key(i);
-                            if (k && k.indexOf('tripData:') === 0 && k !== CACHE_KEY) sessionStorage.removeItem(k);
-                        }
-                        var cached = sessionStorage.getItem(CACHE_KEY);
-                        if (cached) { reveal(JSON.parse(cached)); return; }
-                    } catch (e) {}
 
                     btn.disabled = false;
                     btn.textContent = '解锁 Unlock';
@@ -297,7 +321,7 @@
                 }
             }
 
-            initialize();
+            (typeof window !== 'undefined' && window.TripOffline ? window.TripOffline.prepareData() : Promise.resolve()).catch(function () {}).then(initialize);
         })();
     </script>
 
@@ -486,6 +510,8 @@
             const pick=(en,cn)=>zh?cn:en;
             const [date,setDate]=React.useState(day.date);
             const [result,setResult]=React.useState(null);
+            const [online,setOnline]=React.useState(navigator.onLine);
+            React.useEffect(()=>{const update=()=>setOnline(navigator.onLine);window.addEventListener('online',update);window.addEventListener('offline',update);return()=>{window.removeEventListener('online',update);window.removeEventListener('offline',update);};},[]);
             const [busy,setBusy]=React.useState(false);
             const token=React.useRef(0);
             React.useEffect(()=>{token.current++;setDate(day.date);setResult(null);setBusy(false);},[day.date]);
@@ -496,16 +522,17 @@
                 setResult({results,checked:new Date().toISOString()});setBusy(false);
             };
             const values=result?.results.filter(r=>r.status==='fulfilled').map(r=>r.value)||[];
-            const incomplete=values.length!==day.weatherPoints.length || values.some(v=>!v.summary.available||v.summary.stale||v.summary.rain===null||v.summary.wind===null||v.alerts===null);
+            const incomplete=!online || values.length!==day.weatherPoints.length || values.some(v=>!v.summary.available||v.summary.stale||v.summary.rain===null||v.summary.wind===null||v.alerts===null);
             const caution=values.some(v=>v.summary.caution||v.alerts?.some(a=>['Extreme','Severe','Moderate'].includes(a.severity)));
             const wet=values.some(v=>v.summary.wet);
             const temp=v=>v===null?'—':`${Math.round(v)}°F / ${Math.round((v-32)*5/9)}°C`;
             const time=v=>new Date(v).toLocaleString(zh?'zh-CN':'en-US',{timeZone:'America/Denver',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
             return <section className="morning-check" aria-label={pick('Morning weather check','早晨天气检查')}>
                 <h3>{pick('Before you set off','出发前看一眼')}</h3>
+                <p role="status">{online?pick('Internet required. Results are a dated snapshot, not continuous live monitoring.','需联网。结果为标注时间的快照，并非持续实时监控。'):pick('Offline: weather, alerts, roads and eruption predictions cannot be refreshed. Any displayed results may be stale.','离线：天气、警报、道路和喷发预测无法刷新。已显示结果可能过时。')}</p>
                 <p>{pick('Check the forecast for this route, then check road access. All times are Yellowstone time (MDT).','先查这条路线的预报，再确认道路通行。时间均为黄石当地 MDT。')}</p>
                 <div className="weather-controls"><label>{pick('Forecast date','预报日期')}<input type="date" value={date} onChange={e=>{token.current++;setDate(e.target.value);setResult(null);setBusy(false);}} /></label>
-                <button className="guide-primary" disabled={busy||!date} onClick={check}>{busy?pick('Checking…','正在检查…'):pick('Check weather now','立即查天气')}</button></div>
+                <button className="guide-primary" disabled={busy||!date||!online} onClick={check}>{busy?pick('Checking…','正在检查…'):pick('Check weather now','立即查天气')}</button></div>
                 <div aria-live="polite">{result && <>
                     <div className={'weather-verdict '+(incomplete||caution?'weather-caution':'')}><strong>{incomplete?pick('Check incomplete — confirm manually','检查不完整，请手动确认'):caution?pick('Reconsider outdoor stops','重新评估户外安排'):wet?pick('Keep the day flexible','今天灵活安排'):pick('Forecast supports this route','预报支持这条路线')}</strong>
                     <p>{incomplete?pick('Missing or older forecast data cannot confirm the plan. Open the official forecasts below.','缺失或较旧的预报不能确认行程，请打开下方官方预报。'):caution?day.caution:wet?day.wet:day.fair}</p></div>
@@ -521,7 +548,7 @@
                         <a href={`https://forecast.weather.gov/MapClick.php?lat=${point.lat}&lon=${point.lon}`} target="_blank" rel="noopener noreferrer">{pick('Official forecast & alerts ↗','官方预报与警报 ↗')}</a>
                     </div>;})}
                 </>}</div>
-                <div className="guide-links"><a href="https://www.nps.gov/yell/planyourvisit/parkroads.htm" target="_blank" rel="noopener noreferrer">{pick('Park roads ↗','公园道路 ↗')}</a><a href="https://www.511mt.net/" target="_blank" rel="noopener noreferrer">{pick('Montana roads ↗','蒙大拿道路 ↗')}</a><a href="https://fire.airnow.gov/" target="_blank" rel="noopener noreferrer">{pick('Smoke map ↗','烟霾地图 ↗')}</a></div>
+                <div className="guide-links"><a href="https://www.nps.gov/yell/planyourvisit/geyser-activity.htm" target="_blank" rel="noopener noreferrer">{pick('Geyser predictions ↗','喷发预测 ↗')}</a><a href="https://www.nps.gov/yell/planyourvisit/parkroads.htm" target="_blank" rel="noopener noreferrer">{pick('Park roads ↗','公园道路 ↗')}</a><a href="https://www.511mt.net/" target="_blank" rel="noopener noreferrer">{pick('Montana roads ↗','蒙大拿道路 ↗')}</a><a href="https://fire.airnow.gov/" target="_blank" rel="noopener noreferrer">{pick('Smoke map ↗','烟霾地图 ↗')}</a></div>
                 <p className="guide-meta">{pick('The check suggests changes; it does not automatically rewrite your itinerary. If changing days, choose a route above and set the forecast date to the day you will actually go.','此检查提供调整建议，不会自动改写行程。调换游览日时，请在上方选路线，并把预报日期改为实际出行日。')}</p>
             </section>;
         };
@@ -532,19 +559,37 @@
             return <section className="daily-guide">
                 <h2 className="text-xl font-bold">{pick('Your day, at a glance','今天怎么玩')}</h2>
                 <div className="day-selector" role="group" aria-label={pick('Choose a day','选择日期')}>{days.map((d,i)=><button key={d.date} aria-pressed={selected===i} onClick={()=>setSelected(i)}>{d.shortLabel}</button>)}</div>
-                <WeatherCheck key={day.date} day={day} zh={zh} />
+                <p className="guide-meta">{pick('Static itinerary guidance · driving ranges exclude parking, wildlife and construction delays.','静态行程建议 · 车程区间不含停车、动物及施工延误。')}</p>
                 <article className="day-plan mt-5">
                     {day.photo && <figure><img src={day.photo.url} alt={day.photo.alt} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.hidden=true;}} /><figcaption>{day.photo.caption} · <a href={day.photo.sourceUrl} target="_blank" rel="noopener noreferrer">{day.photo.credit}</a> · {pick('Reference photo, not current conditions','参考照片，非实时景象')}</figcaption></figure>}
-                    <div className="day-body"><p className="guide-eyebrow">{day.date} · MDT</p><h3>{day.title}</h3><p>{day.intro}</p>
+                    <div className="day-body"><p className="guide-eyebrow">{day.date} · MDT</p><h3>{day.title}</h3>{day.badge && <p className="day-badge">{day.badge}</p>}<p>{day.intro}</p>
                         <dl className="day-facts">{day.facts.map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
-                        <ol className="day-stops">{day.stops.map((stop,i)=><li key={i}><span className="stop-number">{i+1}</span><div><strong>{stop.title}</strong><p>{stop.text}</p></div></li>)}</ol>
+                        <ol className="day-stops">{day.stops.map((stop,i)=><li key={i}>
+                            <article className={'stop-card '+(stop.reset?'reset-point':'')}>
+                                {stop.reset && <p className="day-badge">{pick('RESET POINT','补给休整点')}</p>}
+                                <h4><span className="stop-number">{i+1}</span> {stop.time && <span>{stop.time} · </span>}{stop.title}</h4>
+                                {(stop.drive||stop.duration) && <p className="stop-metrics">🚗 {stop.drive} · ⏱ {stop.duration}</p>}
+                                {stop.parking && <dl className="stop-facilities">{[[pick('Parking','停车'),stop.parking],[pick('Restrooms','洗手间'),stop.restroom],[pick('Food','餐饮'),stop.food],[pick('Gas','加油'),stop.gas]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>}
+                                {stop.awareness && <p className={'wildlife-level wildlife-'+stop.awareness}>{stop.awareness==='green'?pick('🟢 Wildlife: normal awareness','🟢 野生动物：常规留意'):stop.awareness==='yellow'?pick('🟡 Wildlife: real trail; stay together, spray accessible','🟡 野生动物：真实步道；结伴，熊喷雾随手可取'):pick('🟠 Wildlife zone: watch from vehicle / legal pullouts; never approach','🟠 动物活动区：车内／合法停车点观察，不靠近')}</p>}
+                                <p>{stop.text}</p>
+                                {stop.priority && <p><strong>{pick('Priority','优先级')}: </strong>{stop.priority}</p>}
+                                {stop.decision && <p><strong>{pick('Safe to skip?','可跳过？')} </strong>{stop.decision}</p>}
+                                {stop.fallback && <p><strong>{pick('Parking fallback','停车备选')}: </strong>{stop.fallback}</p>}
+                                {stop.next && <p className="next-reset"><strong>{pick('Next reliable facilities','下一可靠补给点')}: </strong>{stop.next}</p>}
+                                {stop.turnaround && <div className="turnaround"><strong>{pick('Optional extension / turnaround','可选延伸／折返点')}</strong><p>{stop.turnaround}</p></div>}
+                            </article>
+                            {i<day.stops.length-1 && <div className="next-leg">↓ {day.stops[i+1].drive} {pick('drive','车程')}<br/>{pick('NEXT','下一站')} → {day.stops[i+1].title}</div>}
+                        </li>)}</ol>
                         <div className="day-rest"><strong>{pick('Keep it comfortable','轻松原则')}</strong><p>{day.comfort}</p></div>
-                        <h4 className="font-semibold mt-5">{pick('Directions, one leg at a time','分段导航')}</h4><p className="guide-meta">{pick('Open the next leg in Google Maps. Check signs and road closures; map estimates exclude sightseeing and wildlife delays.','在 Google 地图打开下一段。以路标和道路封闭信息为准；地图时间不含游览与动物堵车。')}</p>
+                        {day.routes.length>0 && <h4 className="font-semibold mt-5">{pick('Directions, one leg at a time','分段导航')}</h4>}<p className="guide-meta">{pick('Use downloaded Google Maps or Apple Maps for the next driving leg. Check signs and road closures; estimates exclude sightseeing and wildlife delays.','下一段驾车请用已下载的Google或Apple离线地图。以路标和道路封闭信息为准；估计不含游览与动物堵车。')}</p>
                         <div className="route-links">{day.routes.map((route,i)=><a key={i} href={route.url} target="_blank" rel="noopener noreferrer"><span>{i+1}. {route.label}</span><span aria-hidden="true">↗</span></a>)}</div>
                         <p className="guide-meta">{day.routeNote}</p>
                         {day.details.map(detail=>{const chapter=report.chapters.find(c=>c.id===detail.id);return chapter?<details className="day-detail" key={detail.id}><summary>{detail.label}</summary>{!detail.blocks&&chapter.paragraphs?.map((p,i)=><p key={i}>{p.text}</p>)}{chapter.blocks?.filter((b,i)=>!detail.blocks||detail.blocks.includes(i)).map((b,i)=><div key={i}><h4 className="font-semibold mt-4">{b.heading}</h4>{b.paragraphs?.map((p,j)=><p key={j}>{p.text}</p>)}</div>)}<a href={`#guide-${detail.id}`}>{pick('Full detail & sources ↓','完整说明与来源 ↓')}</a></details>:null;})}
                     </div>
                 </article>
+                {report.dailyGuide.safety && <details className="day-detail"><summary>{pick('Wildlife distances & trail essentials','动物距离与步道须知')}</summary><p>{report.dailyGuide.safety}</p></details>}
+                {report.dailyGuide.navigation && <p className="guide-meta">{report.dailyGuide.navigation}</p>}
+                <details className="day-detail"><summary>{pick('Live weather, roads & geyser predictions · Internet required','实时天气、道路与喷发预测 · 需联网')}</summary><WeatherCheck key={day.date} day={day} zh={zh} /></details>
             </section>;
         };
 
@@ -587,9 +632,9 @@
             const report = y.sections.filter(s => s.type === 'research').slice(-1)[0];
             if (!report) return <LegacyYellowstone y={y} />;
             return <div className="space-y-8"><ResearchGuide report={report} />
-                <details className="border-t pt-4 text-gray-600"><summary className="cursor-pointer">{report.archiveLabel}</summary>
+                {!report.dailyGuide?.finalized && <details className="border-t pt-4 text-gray-600"><summary className="cursor-pointer">{report.archiveLabel}</summary>
                     <div className="mt-4"><LegacyYellowstone y={{ ...y, sections: y.sections.filter(s => s.type !== 'research') }} /></div>
-                </details></div>;
+                </details>}</div>;
         };
         /* ---------- Yellowstone page ---------- */
         const LegacyYellowstone = ({ y }) => (
@@ -775,7 +820,10 @@
                     </div>
 
                     {tab === 'timeline' && (
-                        <div className="timeline-container mt-8 relative">
+                        <div>
+                            {latestGuide?.dailyGuide?.finalized && <DailyGuide report={latestGuide} />}
+                            <details open={!latestGuide?.dailyGuide?.finalized} className="day-detail"><summary>{lang==='zh'?'预订及原时间线（旧游览安排以最新指南为准）':'Bookings & original timeline (older sightseeing plans superseded by the guide)'}</summary>
+                            <div className="timeline-container mt-8 relative">
                             {t.phases.map((phase) => (
                                 <div key={phase.id} className="mb-10 relative">
                                     <div className="timeline-dot">{phase.id}</div>
@@ -785,6 +833,7 @@
                                     </div>
                                 </div>
                             ))}
+                            </div></details>
                         </div>
                     )}
 

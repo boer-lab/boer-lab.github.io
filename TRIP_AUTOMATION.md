@@ -39,3 +39,47 @@ node scripts/test-travel-update.mjs
 ```
 
 The trusted-domain list is deliberately narrow. Add a provider only after verifying the legitimate sender domain from a known booking message.
+
+## Mobile guide and offline updates
+
+The active research section uses the existing `yellowstone.sections` append
+format. Its `dailyGuide.days` and `stops` retain their existing fields. Optional
+stop presentation fields are `time`, `drive`, `duration`, `parking`, `restroom`,
+`food`, `gas`, `awareness` (`green`, `yellow`, `orange`), `priority`, `decision`,
+`fallback`, `next`, `reset`, and `turnaround`. Optional guide fields are
+`finalized`, `safety`, and `navigation`; a day may carry a `badge`. A finalized
+guide leads both the guide and timeline tabs; the original timeline is collapsed
+and explicitly marked as superseded for sightseeing. Earlier guide sections do
+not compete with the finalized guide.
+
+To avoid writing a plaintext input file, the update encryption command also
+accepts `-` for stdin. Pipe an in-memory JSON document into that command; never
+print the document or put private values in a saved generator or shell history.
+Only the encrypted output belongs in Git.
+
+Offline support lives in `trip/sw.js` and `trip/offline.js`. The worker scope is
+`/trip/`. It caches a verified app-shell bundle (including pinned local runtime
+assets) and complete encrypted data bundles. The browser captures a bundle ID
+for each initialization so a refresh cannot mix base data and overlay revisions.
+Weather, alerts, external maps and photos are not in the cache allowlist.
+Decrypted data stays in page memory; reload requires the password again. Legacy
+plaintext session entries are removed when the page starts.
+
+Wait for **Offline ready ✓** while connected before leaving service. The status
+includes the cached data's update timestamp; live checks require connectivity.
+A failed data refresh retains the last complete encrypted bundle. The displayed
+trip is not rewritten while unlocked: reload and unlock to view a refreshed
+revision. Browser storage eviction can remove offline copies.
+
+When changing any shell resource, increment `SHELL_VERSION` in `trip/sw.js`.
+Complete prior encrypted revisions are retained for open pages that pinned them;
+clearing site data removes all offline copies. Keep cache contents restricted to
+public assets and encrypted envelopes.
+
+`node scripts/test-trip-browser.mjs` exercises synthetic encrypted fixtures in a
+local browser: unlocking, update ordering, responsive layouts, and offline
+reload. Install Playwright locally or set `PLAYWRIGHT_MODULE` to its module path;
+set `BROWSER_CHANNEL=chrome` to use installed Chrome. It does not unlock or save
+the private production itinerary. `node scripts/test-trip-offline.mjs` separately
+checks failed-refresh retention, immutable bundle selection, and cache exclusions
+using the same browser environment options.

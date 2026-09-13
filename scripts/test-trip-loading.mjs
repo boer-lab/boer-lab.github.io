@@ -31,7 +31,7 @@ async function load(invalidManifest = false) {
       return { ok: true, json: async () => value };
     }
   };
-  await vm.runInNewContext(script.replace('initialize();', 'return initialize();'), context);
+  await vm.runInNewContext(script.replace("            (typeof window !== 'undefined'", "            return (typeof window !== 'undefined'"), context);
   return { elements, requests };
 }
 const broken = await load(true);

@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "Family Trip Dashboard",
+  "short_name": "Trip",
+  "description": "Password-protected family trip dashboard with an encrypted offline copy.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "./icons/trip-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

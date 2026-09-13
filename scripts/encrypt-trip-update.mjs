@@ -6,11 +6,22 @@ import { encryptPublicKeyDocument } from './lib/trip-crypto.mjs';
 
 const [, , inputArg, outputArg] = process.argv;
 if (!inputArg || !outputArg) {
-  console.error('Usage: node scripts/encrypt-trip-update.mjs <update.json> <encrypted-update.json>');
+  console.error('Usage: node scripts/encrypt-trip-update.mjs <update.json|-> <encrypted-update.json>');
   process.exit(1);
 }
 
-const update = JSON.parse(await readFile(resolve(inputArg), 'utf8'));
+// stdin allows private updates to stay in memory instead of a plaintext file.
+let source;
+if (inputArg === '-') {
+  const chunks = [];
+  for await (const chunk of process.stdin) chunks.push(chunk);
+  source = Buffer.concat(chunks).toString('utf8');
+} else {
+  source = await readFile(resolve(inputArg), 'utf8');
+}
+let update;
+try { update = JSON.parse(source); }
+catch { throw new Error('Update input is not valid JSON.'); }
 if (update?.schemaVersion !== 1 || !Array.isArray(update.operations) || !update.operations.length) {
   throw new Error('Update must contain schemaVersion 1 and at least one operation.');
 }
