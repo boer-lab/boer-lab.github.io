@@ -44,7 +44,7 @@ The trusted-domain list is deliberately narrow. Add a provider only after verify
 
 The active research section uses the existing `yellowstone.sections` append
 format. Its `dailyGuide.days` and `stops` retain their existing fields. Optional
-stop presentation fields are `time`, `drive`, `duration`, `parking`, `restroom`,
+stop presentation fields are `time`, `drive`, `duration`, `navigation`, `parking`, `restroom`,
 `food`, `gas`, `awareness` (`green`, `yellow`, `orange`), `priority`, `decision`,
 `fallback`, `next`, `reset`, and `turnaround`. Optional guide fields are
 `finalized`, `safety`, and `navigation`; a day may carry a `badge`. A finalized

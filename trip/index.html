@@ -76,6 +76,9 @@
         .stop-card .stop-number {display:inline-flex;vertical-align:middle;margin-right:6px;}
         .day-stops li {display:block;margin:0;min-width:0;}
         .stop-metrics,.wildlife-level {font-size:.9rem;}
+        .stop-navigation {margin:12px 0;padding:10px 12px;border-radius:8px;background:#e0f2fe;color:#164e63;font-size:.95rem;}
+        .stop-navigation strong {display:block;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:#0369a1;}
+        .stop-navigation span {display:block;margin-top:2px;font-weight:700;}
         .stop-facilities {display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;font-size:.9rem;}
         .stop-facilities dt {font-weight:600;color:#475569;}.stop-facilities dd {margin:0;}
         .reset-point {border:2px solid #0284c7;background:#f0f9ff;}
@@ -569,6 +572,7 @@
                                 {stop.reset && <p className="day-badge">{pick('RESET POINT','补给休整点')}</p>}
                                 <h4><span className="stop-number">{i+1}</span> {stop.time && <span>{stop.time} · </span>}{stop.title}</h4>
                                 {(stop.drive||stop.duration) && <p className="stop-metrics">🚗 {stop.drive} · ⏱ {stop.duration}</p>}
+                                {stop.navigation && <p className="stop-navigation"><strong>{pick('Type in Apple Maps','在Apple地图中输入')}</strong><span>{stop.navigation}</span></p>}
                                 {stop.parking && <dl className="stop-facilities">{[[pick('Parking','停车'),stop.parking],[pick('Restrooms','洗手间'),stop.restroom],[pick('Food','餐饮'),stop.food],[pick('Gas','加油'),stop.gas]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>}
                                 {stop.awareness && <p className={'wildlife-level wildlife-'+stop.awareness}>{stop.awareness==='green'?pick('🟢 Wildlife: normal awareness','🟢 野生动物：常规留意'):stop.awareness==='yellow'?pick('🟡 Wildlife: real trail; stay together, spray accessible','🟡 野生动物：真实步道；结伴，熊喷雾随手可取'):pick('🟠 Wildlife zone: watch from vehicle / legal pullouts; never approach','🟠 动物活动区：车内／合法停车点观察，不靠近')}</p>}
                                 <p>{stop.text}</p>
