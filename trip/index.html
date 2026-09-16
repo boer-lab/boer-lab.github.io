@@ -250,6 +250,15 @@
                     var index = day.stops.findIndex(function (stop) { return nestedMatches(stop, edit.afterMatch || {}); });
                     day.stops.splice(index < 0 ? day.stops.length : index + 1, 0, edit.value);
                 });
+                (operation.stopMoves || []).forEach(function (edit) {
+                    var day = days.find(function (candidate) { return nestedMatches(candidate, edit.dayMatch); });
+                    if (!day || !Array.isArray(day.stops)) return;
+                    var fromIndex = day.stops.findIndex(function (stop) { return nestedMatches(stop, edit.match); });
+                    if (fromIndex < 0) return;
+                    var moved = day.stops.splice(fromIndex, 1)[0];
+                    var targetIndex = day.stops.findIndex(function (stop) { return nestedMatches(stop, edit.beforeMatch || {}); });
+                    day.stops.splice(targetIndex < 0 ? day.stops.length : targetIndex, 0, moved);
+                });
             }
 
             function applyUpdate(trip, update) {
