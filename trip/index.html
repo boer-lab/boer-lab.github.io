@@ -72,6 +72,13 @@
 
         * {box-sizing:border-box;}
         .stop-card {width:100%;min-width:0;border:1px solid #cbd5e1;border-radius:12px;background:#fff;padding:16px;overflow-wrap:anywhere;}
+        .stop-photo {margin:-16px -16px 14px;overflow:hidden;border-radius:11px 11px 0 0;background:#e2e8f0;}
+        .stop-photo img {display:block;width:100%;height:190px;object-fit:cover;}
+        .stop-photo figcaption {padding:7px 12px;font-size:.75rem;line-height:1.4;color:#475569;background:#f8fafc;border-bottom:1px solid #e2e8f0;}
+        .stop-photo a {color:#075985;text-decoration:underline;}
+        .stop-highlight {margin:12px 0;padding:12px 14px;border-left:4px solid #0ea5e9;border-radius:8px;background:#f0f9ff;}
+        .stop-highlight strong {display:block;margin-bottom:3px;color:#0c4a6e;font-size:.8rem;letter-spacing:.04em;text-transform:uppercase;}
+        .stop-complete {display:inline-block;margin:0 0 10px;padding:4px 9px;border-radius:999px;background:#dcfce7;color:#166534;font-size:.78rem;font-weight:700;}
         .stop-card h4 {font-weight:700;font-size:1.1rem;line-height:1.5;}
         .stop-card .stop-number {display:inline-flex;vertical-align:middle;margin-right:6px;}
         .day-stops li {display:block;margin:0;min-width:0;}
@@ -212,6 +219,39 @@
                 });
             }
 
+            function nestedMatches(item, match) {
+                return Object.keys(match || {}).every(function (key) {
+                    if (key === 'titleContains' || key === 'navigationContains') {
+                        var field = key === 'titleContains' ? 'title' : 'navigation';
+                        return String(item[field] || '').toLowerCase().indexOf(String(match[key]).toLowerCase()) !== -1;
+                    }
+                    return item[key] === match[key];
+                });
+            }
+
+            function applyDailyGuideEdits(item, operation) {
+                var days = item && item.dailyGuide && item.dailyGuide.days;
+                if (!Array.isArray(days)) return;
+                (operation.dayMerges || []).forEach(function (edit) {
+                    var day = days.find(function (candidate) { return nestedMatches(candidate, edit.match); });
+                    if (day && edit.set) Object.assign(day, edit.set);
+                });
+                (operation.stopMerges || []).forEach(function (edit) {
+                    var day = days.find(function (candidate) { return nestedMatches(candidate, edit.dayMatch); });
+                    if (!day || !Array.isArray(day.stops)) return;
+                    day.stops.forEach(function (stop) {
+                        if (nestedMatches(stop, edit.match)) Object.assign(stop, edit.set || {});
+                    });
+                });
+                (operation.stopInserts || []).forEach(function (edit) {
+                    var day = days.find(function (candidate) { return nestedMatches(candidate, edit.dayMatch); });
+                    if (!day || !Array.isArray(day.stops) || !edit.value) return;
+                    if (edit.unlessMatch && day.stops.some(function (stop) { return nestedMatches(stop, edit.unlessMatch); })) return;
+                    var index = day.stops.findIndex(function (stop) { return nestedMatches(stop, edit.afterMatch || {}); });
+                    day.stops.splice(index < 0 ? day.stops.length : index + 1, 0, edit.value);
+                });
+            }
+
             function applyUpdate(trip, update) {
                 if (!update || update.schemaVersion !== 1 || !Array.isArray(update.operations)) {
                     throw new Error('TRIP_UPDATE_INVALID');
@@ -233,6 +273,7 @@
                     collection.forEach(function (item) {
                         if (!itemMatches(item, operation.match)) return;
                         Object.assign(item, operation.set);
+                        applyDailyGuideEdits(item, operation);
                         if (operation.segmentSet && operation.match.segmentFlight && Array.isArray(item.segments)) {
                             var wanted = String(operation.match.segmentFlight).replace(/\s/g, '').toUpperCase();
                             item.segments.forEach(function (segment) {
@@ -569,12 +610,15 @@
                         <dl className="day-facts">{day.facts.map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
                         <ol className="day-stops">{day.stops.map((stop,i)=><li key={i}>
                             <article className={'stop-card '+(stop.reset?'reset-point':'')}>
+                                {stop.photo && <figure className="stop-photo"><img src={stop.photo.url} alt={stop.photo.alt || ''} loading="lazy" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.closest('figure').hidden=true;}} /><figcaption>{stop.photo.caption}{stop.photo.credit && <> · <a href={stop.photo.sourceUrl} target="_blank" rel="noopener noreferrer">{stop.photo.credit}</a></>}</figcaption></figure>}
                                 {stop.reset && <p className="day-badge">{pick('RESET POINT','补给休整点')}</p>}
+                                {stop.completed && <p className="stop-complete">✓ {pick('Completed','已完成')}</p>}
                                 <h4><span className="stop-number">{i+1}</span> {stop.time && <span>{stop.time} · </span>}{stop.title}</h4>
                                 {(stop.drive||stop.duration) && <p className="stop-metrics">🚗 {stop.drive} · ⏱ {stop.duration}</p>}
                                 {stop.navigation && <p className="stop-navigation"><strong>{pick('Type in Apple Maps','在Apple地图中输入')}</strong><span>{stop.navigation}</span></p>}
                                 {stop.parking && <dl className="stop-facilities">{[[pick('Parking','停车'),stop.parking],[pick('Restrooms','洗手间'),stop.restroom],[pick('Food','餐饮'),stop.food],[pick('Gas','加油'),stop.gas]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>}
                                 {stop.awareness && <p className={'wildlife-level wildlife-'+stop.awareness}>{stop.awareness==='green'?pick('🟢 Wildlife: normal awareness','🟢 野生动物：常规留意'):stop.awareness==='yellow'?pick('🟡 Wildlife: real trail; stay together, spray accessible','🟡 野生动物：真实步道；结伴，熊喷雾随手可取'):pick('🟠 Wildlife zone: watch from vehicle / legal pullouts; never approach','🟠 动物活动区：车内／合法停车点观察，不靠近')}</p>}
+                                {stop.whatToView && <div className="stop-highlight"><strong>{pick('What to view','重点看什么')}</strong><span>{stop.whatToView}</span></div>}
                                 <p>{stop.text}</p>
                                 {stop.priority && <p><strong>{pick('Priority','优先级')}: </strong>{stop.priority}</p>}
                                 {stop.decision && <p><strong>{pick('Safe to skip?','可跳过？')} </strong>{stop.decision}</p>}

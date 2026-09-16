@@ -6,7 +6,7 @@
 'use strict';
 
 const CACHE_NAMESPACE = 'trip-offline';
-const SHELL_VERSION = '2026-09-15-1';
+const SHELL_VERSION = '2026-09-16-1';
 const SHELL_PREFIX = `${CACHE_NAMESPACE}-shell-${SHELL_VERSION}-`;
 const DATA_PREFIX = `${CACHE_NAMESPACE}-data-v1-`;
 const COMPLETE_MARKER = new URL('./__offline_complete__', self.registration.scope).href;

@@ -46,11 +46,17 @@ The active research section uses the existing `yellowstone.sections` append
 format. Its `dailyGuide.days` and `stops` retain their existing fields. Optional
 stop presentation fields are `time`, `drive`, `duration`, `navigation`, `parking`, `restroom`,
 `food`, `gas`, `awareness` (`green`, `yellow`, `orange`), `priority`, `decision`,
-`fallback`, `next`, `reset`, and `turnaround`. Optional guide fields are
+`fallback`, `next`, `reset`, `turnaround`, `whatToView`, `photo`, and `completed`. Optional guide fields are
 `finalized`, `safety`, and `navigation`; a day may carry a `badge`. A finalized
 guide leads both the guide and timeline tabs; the original timeline is collapsed
 and explicitly marked as superseded for sightseeing. Earlier guide sections do
 not compete with the finalized guide.
+
+For narrow daily-guide revisions, a normal `merge` operation may also include
+`dayMerges`, `stopMerges`, and `stopInserts`. These target an existing guide day
+by `date` and a stop by `titleContains` or `navigationContains`, avoiding a full
+replacement of the encrypted `dailyGuide`. Use `unlessMatch` on insertions so
+replaying an update cannot duplicate a stop.
 
 To avoid writing a plaintext input file, the update encryption command also
 accepts `-` for stdin. Pipe an in-memory JSON document into that command; never
