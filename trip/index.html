@@ -879,7 +879,7 @@
                     {tab === 'timeline' && (
                         <div>
                             {latestGuide?.dailyGuide?.finalized && <DailyGuide report={latestGuide} />}
-                            <details open={!latestGuide?.dailyGuide?.finalized} className="day-detail"><summary>{lang==='zh'?'预订及原时间线（旧游览安排以最新指南为准）':'Bookings & original timeline (older sightseeing plans superseded by the guide)'}</summary>
+                            <details open className="day-detail"><summary>{lang==='zh'?'完整旅行时间线（波士顿、波特兰、黄石、上海及全部预订）':'Complete trip timeline (Boston, Portland, Yellowstone, Shanghai & all bookings)'}</summary>
                             <div className="timeline-container mt-8 relative">
                             {t.phases.map((phase) => (
                                 <div key={phase.id} className="mb-10 relative">
