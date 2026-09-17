@@ -878,8 +878,15 @@
 
                     {tab === 'timeline' && (
                         <div>
-                            {latestGuide?.dailyGuide?.finalized && <DailyGuide report={latestGuide} />}
-                            <details open className="day-detail"><summary>{lang==='zh'?'完整旅行时间线（波士顿、波特兰、黄石、上海及全部预订）':'Complete trip timeline (Boston, Portland, Yellowstone, Shanghai & all bookings)'}</summary>
+                            <div className="mb-6">
+                                <h2 className="text-2xl font-bold text-gray-900">{lang === 'zh' ? '完整旅行时间线' : 'Complete trip timeline'}</h2>
+                                <p className="mt-2 text-sm text-gray-500">{lang === 'zh' ? '波士顿、波特兰、黄石、上海及全部预订' : 'Boston, Portland, Yellowstone, Shanghai, and all bookings'}</p>
+                                {latestGuide?.dailyGuide?.finalized && (
+                                    <button onClick={() => setTab('yellowstone')} className="mt-3 text-sm font-semibold underline text-sky-900">
+                                        {lang === 'zh' ? '查看 9月17日观麋鹿详细指南' : 'View the detailed September 17 elk guide'}
+                                    </button>
+                                )}
+                            </div>
                             <div className="timeline-container mt-8 relative">
                             {t.phases.map((phase) => (
                                 <div key={phase.id} className="mb-10 relative">
@@ -890,7 +897,7 @@
                                     </div>
                                 </div>
                             ))}
-                            </div></details>
+                            </div>
                         </div>
                     )}
 
