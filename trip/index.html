@@ -261,6 +261,33 @@
                 });
             }
 
+            function applyPhaseItemEdits(phase, operation) {
+                var edits = operation.itemMerges || [];
+                if (!edits.length) return;
+                if (operation.collection !== 'phases' || !phase || !Array.isArray(phase.items)) {
+                    throw new Error('TRIP_UPDATE_INVALID');
+                }
+                var allowedFields = ['date', 'time', 'desc', 'status', 'warn', 'check_in', 'check_out'];
+                edits.forEach(function (edit) {
+                    if (!edit || !edit.match || !edit.set) throw new Error('TRIP_UPDATE_INVALID');
+                    var matchKeys = Object.keys(edit.match);
+                    var setKeys = Object.keys(edit.set);
+                    var hasStableSelector = matchKeys.indexOf('type') !== -1 &&
+                        matchKeys.some(function (key) {
+                            return ['titleContains', 'date', 'check_in', 'check_out'].indexOf(key) !== -1;
+                        });
+                    if (matchKeys.length < 2 || !hasStableSelector || !setKeys.length ||
+                        setKeys.some(function (key) { return allowedFields.indexOf(key) === -1; })) {
+                        throw new Error('TRIP_UPDATE_INVALID');
+                    }
+                    var matches = phase.items.filter(function (candidate) {
+                        return nestedMatches(candidate, edit.match);
+                    });
+                    if (matches.length !== 1) throw new Error('TRIP_UPDATE_INVALID');
+                    Object.assign(matches[0], edit.set);
+                });
+            }
+
             function applyUpdate(trip, update) {
                 if (!update || update.schemaVersion !== 1 || !Array.isArray(update.operations)) {
                     throw new Error('TRIP_UPDATE_INVALID');
@@ -278,11 +305,12 @@
                     if (operation.op !== 'merge' || !operation.match || !operation.set) {
                         throw new Error('TRIP_UPDATE_INVALID');
                     }
-                    var matched = false;
+                    var matchedCount = 0;
                     collection.forEach(function (item) {
                         if (!itemMatches(item, operation.match)) return;
                         Object.assign(item, operation.set);
                         applyDailyGuideEdits(item, operation);
+                        applyPhaseItemEdits(item, operation);
                         if (operation.segmentSet && operation.match.segmentFlight && Array.isArray(item.segments)) {
                             var wanted = String(operation.match.segmentFlight).replace(/\s/g, '').toUpperCase();
                             item.segments.forEach(function (segment) {
@@ -291,9 +319,11 @@
                                 }
                             });
                         }
-                        matched = true;
+                        matchedCount += 1;
                     });
-                    if (!matched) throw new Error('TRIP_UPDATE_INVALID');
+                    if (!matchedCount || (operation.itemMerges && matchedCount !== 1)) {
+                        throw new Error('TRIP_UPDATE_INVALID');
+                    }
                 });
             }
 

@@ -36,6 +36,23 @@ for (const operation of update.operations) {
   if (operation.op === 'append' && !operation.value) {
     throw new Error('Append operations need a value.');
   }
+  if (operation.itemMerges !== undefined) {
+    if (operation.op !== 'merge' || operation.collection !== 'phases' ||
+        !Array.isArray(operation.itemMerges) || !operation.itemMerges.length) {
+      throw new Error('Nested item merges require a nonempty phases merge operation.');
+    }
+    const allowedFields = new Set(['date', 'time', 'desc', 'status', 'warn', 'check_in', 'check_out']);
+    for (const edit of operation.itemMerges) {
+      const matchKeys = Object.keys(edit?.match || {});
+      const setKeys = Object.keys(edit?.set || {});
+      const hasStableSelector = matchKeys.includes('type') &&
+        matchKeys.some((key) => ['titleContains', 'date', 'check_in', 'check_out'].includes(key));
+      if (matchKeys.length < 2 || !hasStableSelector || !setKeys.length ||
+          setKeys.some((key) => !allowedFields.has(key))) {
+        throw new Error('Each nested item merge needs a stable selector and allowlisted fields.');
+      }
+    }
+  }
 }
 
 const payload = JSON.parse(await readFile(resolve('trip/payload.json'), 'utf8'));
