@@ -312,6 +312,39 @@
                 });
             }
 
+            function applyCurrentFlightCorrections(trip) {
+                ['en', 'zh'].forEach(function (localeKey) {
+                    var locale = trip[localeKey];
+                    if (!locale || !Array.isArray(locale.phases)) return;
+                    var target = locale.phases.find(function (phase) { return String(phase.id) === '4'; });
+                    if (!target || !Array.isArray(target.items)) return;
+                    locale.phases.forEach(function (phase) {
+                        if (!Array.isArray(phase.items)) return;
+                        phase.items = phase.items.filter(function (item) {
+                            return !Array.isArray(item.segments) || !item.segments.some(function (s) {
+                                var f = String(s.flight || '').replace(/\\s/g, '').toUpperCase();
+                                return f === 'CZ3544' || f === 'MU2544';
+                            });
+                        });
+                    });
+                    target.items.push(localeKey === 'en' ? {
+                        date:'Oct 18', status:'Ticketed', type:'flight',
+                        title:'Shanghai → Wuhan · China Eastern MU2544', time:'22:20–00:20 (+1)',
+                        desc:'Continue to Wuhan after entering China at Shanghai Pudong. Separate ticket; self-transfer. DL281 arrives PVG T1 at 19:50 and MU2544 also departs T1, giving a scheduled 2h30m connection with no terminal change.',
+                        warn:'Separate-ticket international → domestic transfer at PVG T1: immigration → collect checked baggage → customs → China Eastern check-in/bag drop → domestic security → gate. Do not assume bags transfer automatically. Connection is improved but still depends on DL281 arriving on time and immigration/baggage queues.',
+                        segments:[{flight:'MU2544',depart:'22:20',from:'Shanghai Pudong (PVG) T1',arrive:'00:20 (+1)',to:'Wuhan Tianhe (WUH) T3',airline:'China Eastern',cabin:'Economy',aircraft:'Boeing 737',duration:'2h',status:'Ticketed'}],
+                        logistics:['DL281 scheduled arrival: PVG T1 at 19:50.','Stay in T1; no T1→T2 transfer is needed.','Clear immigration, collect all checked bags and pass customs.','Proceed to China Eastern domestic check-in/bag drop for MU2544.','Clear domestic security and go directly to the gate.','Scheduled connection time: 2h30m.']
+                    } : {
+                        date:'10月18日', status:'已出票', type:'flight',
+                        title:'上海 → 武汉 · 东方航空 MU2544', time:'22:20–00:20（次日）',
+                        desc:'入境上海浦东后继续前往武汉。两段为分开出票，按自行中转准备。DL281 预计19:50抵达浦东T1，MU2544也从T1出发，计划中转时间2小时30分，无需换航站楼。',
+                        warn:'分开出票的国际转国内流程（浦东T1）：入境边检 → 提取托运行李 → 海关 → 东方航空值机/重新托运行李 → 国内安检 → 登机口。不要默认行李会直挂。新航班衔接明显更合理，但仍受DL281延误、入境和行李等待时间影响。',
+                        segments:[{flight:'MU2544',depart:'22:20',from:'上海浦东机场 (PVG) T1',arrive:'00:20（次日）',to:'武汉天河机场 (WUH) T3',airline:'东方航空',cabin:'经济舱',aircraft:'波音737',duration:'2小时',status:'已出票'}],
+                        logistics:['DL281预计19:50抵达浦东T1。','全程留在T1，无需T1→T2换航站楼。','先办理入境、提取全部托运行李并过海关。','前往东方航空国内值机柜台办理MU2544并重新托运行李。','通过国内安检后直接前往登机口。','计划中转时间：2小时30分。']
+                    });
+                });
+            }
+
             function reveal(data) {
                 function go() {
                     if (!window.mountTrip) { setTimeout(go, 30); return; }
@@ -336,6 +369,7 @@
                 btn.textContent = '解锁中… Unlocking';
                 try {
                     var data = await decryptTrip(pw.value);
+                    applyCurrentFlightCorrections(data);
                     pw.value = ''; // Keep decrypted trip data in memory only.
                     reveal(data);
                 } catch (e3) {
