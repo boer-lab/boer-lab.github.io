@@ -271,6 +271,21 @@
                         ? locale && locale.yellowstone && locale.yellowstone.sections
                         : locale && locale[operation.collection];
                     if (!Array.isArray(collection)) throw new Error('TRIP_UPDATE_INVALID');
+                    if (operation.op === 'relocateFlight' && operation.collection === 'phases' && operation.flight && operation.value) {
+                        var wantedFlight = String(operation.flight).replace(/\\s/g, '').toUpperCase();
+                        collection.forEach(function (phase) {
+                            if (!Array.isArray(phase.items)) return;
+                            phase.items = phase.items.filter(function (item) {
+                                return !Array.isArray(item.segments) || !item.segments.some(function (segment) {
+                                    return String(segment.flight || '').replace(/\\s/g, '').toUpperCase() === wantedFlight;
+                                });
+                            });
+                        });
+                        var targetPhase = collection.find(function (phase) { return String(phase.id) === String(operation.phaseId); });
+                        if (!targetPhase || !Array.isArray(targetPhase.items)) throw new Error('TRIP_UPDATE_INVALID');
+                        targetPhase.items.push(operation.value);
+                        return;
+                    }
                     if (operation.op === 'append' && operation.value) {
                         collection.push(operation.value);
                         return;
